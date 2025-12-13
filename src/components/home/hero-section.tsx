@@ -22,8 +22,9 @@ export function HeroSection() {
     const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
         const { clientX, clientY } = e.touches[0]
         const { innerWidth, innerHeight } = window
-        const x = clientX - innerWidth / 2
-        const y = clientY - innerHeight / 2
+        // Increase sensitivity on mobile by multiplying the offset
+        const x = (clientX - innerWidth / 2) * 2.5
+        const y = (clientY - innerHeight / 2) * 2.5
         mouseX.set(x)
         mouseY.set(y)
     }

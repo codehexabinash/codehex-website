@@ -38,7 +38,6 @@ const caseStudies = [
 ]
 
 interface CardProps {
-    i: number
     title: string
     description: string
     image: string
@@ -50,7 +49,7 @@ interface CardProps {
     isLast: boolean
 }
 
-const Card = ({ i, title, description, image, category, color, progress, range, targetScale, isLast }: CardProps) => {
+const Card = ({ title, description, image, category, color, progress, range, targetScale, isLast }: CardProps) => {
     const container = useRef(null)
     const { scrollYProgress } = useScroll({
         target: container,
@@ -69,21 +68,24 @@ const Card = ({ i, title, description, image, category, color, progress, range, 
     const opacityTransform = useTransform(progress, [rangeStart, fadeStart, rangeEnd], [1, 1, 0])
     const opacity = isLast ? 1 : opacityTransform
 
-    // Disable y (lining down) for the last card so it scrolls away naturally
+    // For the last card, we want it to move UP to touch the title before scrolling away
+    // Sequence: Title moves first (0.85-0.92), then Card follows (0.92-1.0)
     const yTransform = useTransform(progress, range, [0, 100])
-    const y = isLast ? 0 : yTransform
+    const lastCardY = useTransform(progress, [0.90, 1], [0, -172]) // Starts slightly overlapping with title end
+    const y = isLast ? lastCardY : yTransform
 
     return (
-        <div ref={container} className="flex h-[80vh] items-center justify-center sticky top-28 sm:h-screen">
+        <div ref={container} className="flex h-[80vh] items-center justify-center sticky top-48 sm:h-screen">
             <motion.div
                 style={{
                     scale,
                     backgroundColor: color,
-                    top: `calc(-5vh + ${i * 25}px)`,
+                    // All cards stop at the same top position
+                    top: `calc(-5vh + 10px)`,
                     opacity,
                     y
                 }}
-                className="relative flex h-[500px] w-full flex-col justify-between overflow-hidden rounded-3xl border border-white/10 p-4 shadow-2xl sm:h-[600px] md:h-[650px] lg:h-[700px] md:flex-row md:p-12 origin-top"
+                className="relative flex h-[420px] w-full flex-col justify-between overflow-hidden rounded-3xl border border-white/10 p-4 shadow-2xl sm:h-[600px] md:h-[650px] lg:h-[700px] md:flex-row md:p-12 origin-top"
             >
                 <div className="flex flex-col justify-between md:w-[40%]">
                     <div>
@@ -123,24 +125,25 @@ export function CaseStudyCarousel() {
         offset: ['start start', 'end end']
     })
 
+    const titleY = useTransform(scrollYProgress, [0.80, 0.90], [0, -200])
+
     return (
         <section className="bg-background pt-0 pb-20">
-            <div className="sticky top-16 z-20 bg-background/80 backdrop-blur-xl pt-10 pb-10 mb-6">
+            <motion.div style={{ y: titleY }} className="sticky top-5 z-20 bg-background/40 backdrop-blur-xl pt-10 pb-10 mb-6">
                 <div className="container px-4 text-center">
                     <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Featured Work</h2>
                     <p className="mt-2 text-muted-foreground">See how we transform ideas into reality. Scroll to explore.</p>
                 </div>
-            </div>
+            </motion.div>
 
             <div ref={container} className="px-4 w-full">
                 {caseStudies.map((project, i) => {
-                    // Calculate scale target for depth effect
-                    // As we scroll past, previous cards scale down slightly
-                    const targetScale = 1 - ((caseStudies.length - 1 - i) * 0.1)
+                    // Standardize target scale - all cards scale down to same size when leaving
+                    const targetScale = 0.9
                     return (
                         <Card
                             key={project.id}
-                            i={i}
+                            // i passed only for key in map, not prop
                             {...project}
                             progress={scrollYProgress}
                             range={[i * 0.25, 1]}
