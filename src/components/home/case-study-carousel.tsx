@@ -125,7 +125,7 @@ export function CaseStudyCarousel() {
 
     return (
         <section className="bg-background pt-0 pb-20">
-            <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-xl pt-10 pb-10 mb-6">
+            <div className="sticky top-16 z-20 bg-background/80 backdrop-blur-xl pt-10 pb-10 mb-6">
                 <div className="container px-4 text-center">
                     <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Featured Work</h2>
                     <p className="mt-2 text-muted-foreground">See how we transform ideas into reality. Scroll to explore.</p>
