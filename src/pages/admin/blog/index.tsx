@@ -77,8 +77,8 @@ export function BlogListPage() {
                                 <thead className="[&_tr]:border-b">
                                     <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
                                         <th className="h-12 px-4 align-middle font-medium text-muted-foreground">Title</th>
-                                        <th className="h-12 px-4 align-middle font-medium text-muted-foreground">Date</th>
-                                        <th className="h-12 px-4 align-middle font-medium text-muted-foreground">Views</th>
+                                        <th className="h-12 px-4 align-middle font-medium text-muted-foreground hidden md:table-cell">Date</th>
+                                        <th className="h-12 px-4 align-middle font-medium text-muted-foreground hidden lg:table-cell">Views</th>
                                         <th className="h-12 px-4 align-middle font-medium text-muted-foreground">Status</th>
                                         <th className="h-12 px-4 align-middle font-medium text-muted-foreground text-right">Actions</th>
                                     </tr>
@@ -95,17 +95,17 @@ export function BlogListPage() {
                                             <tr key={post.id} className="border-b transition-colors hover:bg-muted/50">
                                                 <td className="p-4 align-middle font-medium">
                                                     <div className="flex items-center gap-2">
-                                                        <FileText className="h-4 w-4 text-muted-foreground" />
-                                                        {post.title}
+                                                        <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
+                                                        <span className="truncate max-w-[150px] sm:max-w-xs">{post.title}</span>
                                                     </div>
                                                 </td>
-                                                <td className="p-4 align-middle text-muted-foreground">
+                                                <td className="p-4 align-middle text-muted-foreground hidden md:table-cell">
                                                     <div className="flex items-center gap-2">
                                                         <Calendar className="h-3 w-3" />
                                                         {new Date(post.created_at).toLocaleDateString()}
                                                     </div>
                                                 </td>
-                                                <td className="p-4 align-middle text-muted-foreground">
+                                                <td className="p-4 align-middle text-muted-foreground hidden lg:table-cell">
                                                     {post.views || 0}
                                                 </td>
                                                 <td className="p-4 align-middle">

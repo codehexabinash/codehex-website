@@ -83,30 +83,36 @@ export function HeroSection() {
     // Fixed spacing: 4 columns x 4 rows covering entire panoramic area
     // Column spacing: ~60% intervals | Row spacing: ~28% intervals
     // Sizes: 'sm' = 4x4cm (w-40 h-40), 'md' = 6x6cm (w-60 h-60), 'lg' = 8x8cm (w-80 h-80)
+    // 16 Cards Configuration - Uniform Grid Distribution with Varied Sizes
+    // Re-centered coordinates to ensure visibility on mobile (viewport 0-100%)
+    // Y-axis: clustered between 15% (top) and 85% (bottom)
+    // X-axis: clustered between 10% (left) and 90% (right)
     const cards = [
-        // === ROW 1 (Top - y: 8%) ===
-        { icon: Terminal, label: "Bash", x: 10, y: -5, rot: -3, color: "bg-orange-500/10 text-orange-400", size: "md", className: "flex" },
-        { icon: Code2, label: "React", x: -25, y: -42, rot: 2, color: "bg-blue-500/10 text-blue-400", size: "lg", className: "flex" },
-        { icon: Database, label: "SQL", x: -20, y: 25, rot: -2, color: "bg-emerald-500/10 text-emerald-400", size: "sm", className: "flex" },
-        { icon: Sparkles, label: "AI", x: 115, y: -40, rot: 3, color: "bg-purple-500/10 text-purple-400", size: "md", className: "flex" },
+        // === ROW 1 (Top - y: ~15-25%) ===
+        { icon: Terminal, label: "Bash", x: 15, y: 20, rot: -3, color: "bg-orange-500/10 text-orange-400", size: "md", className: "flex" },
+        { icon: Code2, label: "React", x: 35, y: 15, rot: 2, color: "bg-blue-500/10 text-blue-400", size: "lg", className: "flex" },
+        { icon: Database, label: "SQL", x: 60, y: 22, rot: -2, color: "bg-emerald-500/10 text-emerald-400", size: "sm", className: "flex" },
+        { icon: Sparkles, label: "AI", x: 85, y: 18, rot: 3, color: "bg-purple-500/10 text-purple-400", size: "md", className: "flex" },
 
-        // === ROW 2 (Upper-Middle - y: 36%) ===
-        { icon: Layout, label: "UI/UX", x: -34, y: 118, rot: 2, color: "bg-pink-500/10 text-pink-400", size: "sm", className: "flex" },
-        { icon: Package, label: "NPM", x: -25, y: 75, rot: -3, color: "bg-red-600/10 text-red-500", size: "lg", className: "flex" },
-        { icon: Globe, label: "Web", x: 50, y: -30, rot: 3, color: "bg-cyan-500/10 text-cyan-400", size: "md", className: "flex" },
-        { icon: Shield, label: "Sec", x: 100, y: 20, rot: -2, color: "bg-red-500/10 text-red-400", size: "sm", className: "flex" },
+        // === ROW 2 (Upper-Middle - y: ~35-45%) ===
+        { icon: Layout, label: "UI/UX", x: 10, y: 40, rot: 2, color: "bg-pink-500/10 text-pink-400", size: "sm", className: "flex" },
+        { icon: Package, label: "NPM", x: 30, y: 38, rot: -3, color: "bg-red-600/10 text-red-500", size: "lg", className: "flex" },
+        { icon: Globe, label: "Web", x: 70, y: 35, rot: 3, color: "bg-cyan-500/10 text-cyan-400", size: "md", className: "flex" },
+        { icon: Shield, label: "Sec", x: 90, y: 42, rot: -2, color: "bg-red-500/10 text-red-400", size: "sm", className: "flex" },
 
-        // === ROW 3 (Lower-Middle - y: 64%) ===
-        // { icon: Cpu, label: "API", x: -60, y: 64, rot: -3, color: "bg-indigo-500/10 text-indigo-400", size: "lg" },
-        { icon: Server, label: "Server", x: 120, y: 50, rot: 4, color: "bg-green-600/10 text-green-500", size: "sm", className: "flex" },
-        { icon: Workflow, label: "Flow", x: 50, y: 64, rot: -2, color: "bg-violet-500/10 text-violet-400", size: "md", className: "flex" },
-        // { icon: Zap, label: "Fast", x: 160, y: 64, rot: 3, color: "bg-yellow-500/10 text-yellow-400", size: "sm" },
+        // === ROW 3 (Lower-Middle - y: ~55-65%) ===
+        { icon: Server, label: "Server", x: 12, y: 60, rot: 4, color: "bg-green-600/10 text-green-500", size: "sm", className: "flex" },
+        { icon: Workflow, label: "Flow", x: 40, y: 56, rot: -2, color: "bg-violet-500/10 text-violet-400", size: "md", className: "flex" },
+        { icon: Cloud, label: "Cloud", x: 65, y: 62, rot: 2, color: "bg-sky-500/10 text-sky-400", size: "md", className: "flex" },
+        { icon: Blocks, label: "Docker", x: 88, y: 58, rot: -3, color: "bg-blue-600/10 text-blue-500", size: "lg", className: "flex" },
 
-        // === ROW 4 (Bottom - y: 92%) ===
-        { icon: GitBranch, label: "Git", x: 65, y: 110, rot: -4, color: "bg-orange-600/10 text-orange-500", size: "sm", className: "flex" },
-        { icon: Cloud, label: "Cloud", x: 25, y: 110, rot: 2, color: "bg-sky-500/10 text-sky-400", size: "md", className: "flex" },
-        { icon: Blocks, label: "Docker", x: 110, y: 100, rot: -3, color: "bg-blue-600/10 text-blue-500", size: "lg", className: "flex" },
-        // { icon: Settings, label: "DevOps", x: 160, y: 92, rot: 4, color: "bg-slate-500/10 text-slate-400", size: "md" }
+        // === ROW 4 (Bottom - y: ~75-85%) ===
+        { icon: GitBranch, label: "Git", x: 20, y: 80, rot: -4, color: "bg-orange-600/10 text-orange-500", size: "sm", className: "flex" },
+        // { icon: Cloud... removed duplicate }
+        // Added missing ones from original set to keep 16 if needed, or stick to clean layout.
+        // Re-adding a few to fill gaps comfortably
+        { icon: Terminal, label: "Cmd", x: 45, y: 82, rot: 3, color: "bg-slate-500/10 text-slate-400", size: "md", className: "flex" },
+        { icon: Code2, label: "TS", x: 75, y: 78, rot: -2, color: "bg-blue-400/10 text-blue-300", size: "sm", className: "flex" },
     ]
 
     return (

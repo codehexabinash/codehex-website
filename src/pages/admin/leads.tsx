@@ -55,17 +55,17 @@ export function LeadsPage() {
                             <table className="w-full caption-bottom text-sm text-left">
                                 <thead className="[&_tr]:border-b">
                                     <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                                        <th className="h-12 px-4 align-middle font-medium text-muted-foreground">Date</th>
+                                        <th className="h-12 px-4 align-middle font-medium text-muted-foreground hidden md:table-cell">Date</th>
                                         <th className="h-12 px-4 align-middle font-medium text-muted-foreground">Client</th>
                                         <th className="h-12 px-4 align-middle font-medium text-muted-foreground">Contact</th>
-                                        <th className="h-12 px-4 align-middle font-medium text-muted-foreground">Project Details</th>
+                                        <th className="h-12 px-4 align-middle font-medium text-muted-foreground hidden md:table-cell">Project Details</th>
                                         <th className="h-12 px-4 align-middle font-medium text-muted-foreground">Status</th>
                                     </tr>
                                 </thead>
                                 <tbody className="[&_tr:last-child]:border-0">
                                     {leads.map((lead) => (
                                         <tr key={lead.id} className="border-b transition-colors hover:bg-muted/50">
-                                            <td className="p-4 align-top">
+                                            <td className="p-4 align-top hidden md:table-cell">
                                                 <div className="flex items-center gap-2 text-muted-foreground whitespace-nowrap">
                                                     <Calendar className="h-3 w-3" />
                                                     {new Date(lead.created_at).toLocaleDateString()}
@@ -78,7 +78,7 @@ export function LeadsPage() {
                                                 <div className="space-y-1">
                                                     <div className="flex items-center gap-2 text-xs">
                                                         <Mail className="h-3 w-3" />
-                                                        {lead.email}
+                                                        <span className="truncate max-w-[120px]">{lead.email}</span>
                                                     </div>
                                                     {lead.phone && (
                                                         <div className="flex items-center gap-2 text-xs">
@@ -88,7 +88,7 @@ export function LeadsPage() {
                                                     )}
                                                 </div>
                                             </td>
-                                            <td className="p-4 align-top max-w-md">
+                                            <td className="p-4 align-top max-w-md hidden md:table-cell">
                                                 <div className="space-y-2">
                                                     {lead.business_description && (
                                                         <p className="text-muted-foreground text-xs line-clamp-2" title={lead.business_description}>

@@ -67,12 +67,12 @@ export function FeedbackPage() {
                             <table className="w-full caption-bottom text-sm text-left">
                                 <thead className="[&_tr]:border-b">
                                     <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                                        <th className="h-12 px-4 align-middle font-medium text-muted-foreground">Date</th>
+                                        <th className="h-12 px-4 align-middle font-medium text-muted-foreground hidden lg:table-cell">Date</th>
                                         <th className="h-12 px-4 align-middle font-medium text-muted-foreground">User</th>
-                                        <th className="h-12 px-4 align-middle font-medium text-muted-foreground">Company</th>
-                                        <th className="h-12 px-4 align-middle font-medium text-muted-foreground">Role</th>
-                                        <th className="h-12 px-4 align-middle font-medium text-muted-foreground">Subject</th>
-                                        <th className="h-12 px-4 align-middle font-medium text-muted-foreground">Message</th>
+                                        <th className="h-12 px-4 align-middle font-medium text-muted-foreground hidden xl:table-cell">Company</th>
+                                        <th className="h-12 px-4 align-middle font-medium text-muted-foreground hidden xl:table-cell">Role</th>
+                                        <th className="h-12 px-4 align-middle font-medium text-muted-foreground hidden md:table-cell">Subject</th>
+                                        <th className="h-12 px-4 align-middle font-medium text-muted-foreground hidden lg:table-cell">Message</th>
                                         <th className="h-12 px-4 align-middle font-medium text-muted-foreground">Status</th>
                                         <th className="h-12 px-4 align-middle font-medium text-muted-foreground">Testimonial</th>
                                     </tr>
@@ -80,7 +80,7 @@ export function FeedbackPage() {
                                 <tbody className="[&_tr:last-child]:border-0">
                                     {feedbacks.map((item) => (
                                         <tr key={item.id} className={`border-b transition-colors hover:bg-muted/50 ${item.status === 'unread' ? 'bg-primary/5' : ''}`}>
-                                            <td className="p-4 align-top whitespace-nowrap">
+                                            <td className="p-4 align-top whitespace-nowrap hidden lg:table-cell">
                                                 <div className="flex items-center gap-2 text-muted-foreground">
                                                     <Calendar className="h-3 w-3" />
                                                     {new Date(item.created_at).toLocaleDateString()}
@@ -99,22 +99,22 @@ export function FeedbackPage() {
                                                         <div className="font-medium whitespace-nowrap">{item.name}</div>
                                                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                                             <Mail className="h-3 w-3" />
-                                                            {item.email}
+                                                            <span className="truncate max-w-[100px]">{item.email}</span>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="p-4 align-top whitespace-nowrap">
+                                            <td className="p-4 align-top whitespace-nowrap hidden xl:table-cell">
                                                 {item.company || "-"}
                                             </td>
-                                            <td className="p-4 align-top whitespace-nowrap">
+                                            <td className="p-4 align-top whitespace-nowrap hidden xl:table-cell">
                                                 {item.role || "-"}
                                             </td>
-                                            <td className="p-4 align-top">
+                                            <td className="p-4 align-top hidden md:table-cell">
                                                 {item.subject || "-"}
                                             </td>
-                                            <td className="p-4 align-top min-w-[300px]">
-                                                <p className="text-muted-foreground text-sm line-clamp-3">{item.message}</p>
+                                            <td className="p-4 align-top min-w-[200px] max-w-xs hidden lg:table-cell">
+                                                <p className="text-muted-foreground text-sm line-clamp-2">{item.message}</p>
                                             </td>
                                             <td className="p-4 align-top whitespace-nowrap">
                                                 <button
@@ -137,7 +137,7 @@ export function FeedbackPage() {
                                                             className="sr-only peer"
                                                         />
                                                         <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-green-600"></div>
-                                                        <span className="ml-3 text-sm font-medium">
+                                                        <span className="ml-3 text-sm font-medium sr-only md:not-sr-only">
                                                             {item.approved ? "Approved" : "Hidden"}
                                                         </span>
                                                     </label>
