@@ -124,7 +124,7 @@ export function HeroSection() {
                         Available for new projects
                     </span>
 
-                    <h1 className="text-6xl font-black tracking-tighter sm:text-8xl md:text-9xl lg:text-[10rem] leading-[0.9]">
+                    <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-[10rem] font-black tracking-tighter leading-[0.9]">
                         CODE<span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-white/40">HEX</span>
                     </h1>
 

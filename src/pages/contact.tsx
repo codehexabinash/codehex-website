@@ -1,8 +1,9 @@
+import { ContactForm } from "../components/home/contact-form"
+
 export function Contact() {
     return (
-        <div className="container py-10">
-            <h1 className="text-4xl font-bold">Contact Us</h1>
-            <p className="mt-4 text-muted-foreground">Get in touch with us.</p>
+        <div className="pt-24 min-h-screen bg-background">
+            <ContactForm />
         </div>
     )
 }

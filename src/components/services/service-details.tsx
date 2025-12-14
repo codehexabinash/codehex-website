@@ -1,8 +1,8 @@
-
 import { motion } from "framer-motion";
 import { type ServiceDetail } from "../../data/services";
 import { fadeInUp, staggerContainer } from "../../utils/animations";
 import { RelatedCaseStudies } from "./related-case-studies";
+import { ContactForm } from "../home/contact-form";
 import { useState } from "react";
 import React from "react";
 
@@ -93,6 +93,10 @@ export function ServiceDetails({ service, icon: Icon }: ServiceDetailsProps) {
 
             <motion.div variants={fadeInUp}>
                 <RelatedCaseStudies studies={service.relatedCaseStudies} />
+            </motion.div>
+
+            <motion.div variants={fadeInUp}>
+                <ContactForm embedded serviceTitle={service.title} />
             </motion.div>
         </motion.div>
     );

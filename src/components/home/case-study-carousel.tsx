@@ -2,40 +2,7 @@ import { useRef } from "react"
 import { motion, useScroll, useTransform, MotionValue } from "framer-motion"
 import { ArrowUpRight } from "lucide-react"
 
-const caseStudies = [
-    {
-        id: 1,
-        title: "FinTech Dashboard Revamp",
-        category: "Web Application",
-        description: "Modernizing a legacy financial platform with React and real-time data visualization. We improved performance by 300% and redesigned the UX for better data accessibility.",
-        image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2670&auto=format&fit=crop",
-        color: "#1e293b" // slate-800
-    },
-    {
-        id: 2,
-        title: "E-Commerce Mobile App",
-        category: "Mobile Development",
-        description: "A seamless shopping experience built with React Native for iOS and Android. Features include AI-powered recommendations, AR product preview, and one-tap checkout.",
-        image: "https://images.unsplash.com/photo-1556742049-0cfed4f7a07d?q=80&w=2670&auto=format&fit=crop",
-        color: "#0f172a" // slate-900 (darker)
-    },
-    {
-        id: 3,
-        title: "Healthcare Patient Portal",
-        category: "Custom Software",
-        description: "Secure and intuitive portal for patient management and appointment scheduling. Fully HIPAA compliant with telemedicine integration and electronic health record syncing.",
-        image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?q=80&w=2670&auto=format&fit=crop",
-        color: "#172554" // blue-950
-    },
-    {
-        id: 4,
-        title: "Smart Logistics Tracker",
-        category: "IoT Solution",
-        description: "Real-time fleet tracking and supply chain management system using IoT sensors. Reduced delivery delays by 40% through predictive route optimization algorithms.",
-        image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=2670&auto=format&fit=crop",
-        color: "#111827" // gray-900
-    }
-]
+import { caseStudies } from "../../data/case-studies"
 
 interface CardProps {
     title: string
@@ -128,7 +95,7 @@ export function CaseStudyCarousel() {
     const titleY = useTransform(scrollYProgress, [0.80, 0.90], [0, -200])
 
     return (
-        <section className="bg-background pt-0 pb-20">
+        <section className="bg-background pt-0 pb-0 -mb-40">
             <motion.div style={{ y: titleY }} className="sticky top-5 z-20 bg-background/40 backdrop-blur-xl pt-10 pb-10 mb-6">
                 <div className="container px-4 text-center">
                     <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Featured Work</h2>

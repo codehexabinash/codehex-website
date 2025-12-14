@@ -1,5 +1,5 @@
 
-import { type LucideIcon, Paintbrush, LineChart, Smartphone, Globe, Cloud } from "lucide-react";
+import { type LucideIcon, Paintbrush, LineChart, Smartphone, Globe, Cloud, BarChart, Cpu } from "lucide-react";
 
 export interface ServiceCategory {
     id: string;
@@ -62,6 +62,18 @@ export const serviceCategories: ServiceCategory[] = [
         title: "Digital Marketing",
         description: "Data-driven marketing strategies to grow your business.",
         icon: LineChart,
+    },
+    {
+        id: "data-analytics",
+        title: "Data Analytics",
+        description: "Turn raw data into actionable insights.",
+        icon: BarChart,
+    },
+    {
+        id: "automation",
+        title: "Automation",
+        description: "Streamline operations with intelligent automation.",
+        icon: Cpu,
     },
 ];
 
@@ -177,6 +189,42 @@ export const servicesData: Record<string, ServiceDetail> = {
         techStack: [
             { name: "Google Analytics", icon: "analytics", description: "Tracking" },
             { name: "SEMrush", icon: "semrush", description: "SEO Tool" },
+        ],
+        relatedCaseStudies: [],
+    },
+    "data-analytics": {
+        categoryId: "data-analytics",
+        title: "Data Analytics & BI",
+        shortDescription: "Turn your data into actionable insights.",
+        fullDescription: "We help you unlock the true potential of your data. Our analytics and Business Intelligence (BI) solutions provide real-time insights, predictive modeling, and visual dashboards to drive informed decision-making.",
+        benefits: [
+            "Data Warehousing & ETL",
+            "Predictive Analytics",
+            "Visual KPI Dashboards",
+            "Process Mining",
+        ],
+        techStack: [
+            { name: "Power BI", icon: "powerbi", description: "Visualization" },
+            { name: "Python", icon: "python", description: "Data Science" },
+            { name: "Snowflake", icon: "snowflake", description: "Data Warehouse" },
+        ],
+        relatedCaseStudies: [],
+    },
+    "automation": {
+        categoryId: "automation",
+        title: "Business Automation",
+        shortDescription: "Streamline workflows and reduce manual effort.",
+        fullDescription: "From simple task automation to complex business process optimization, we build intelligent bots and systems that save time, reduce error rates, and let your team focus on high-value work.",
+        benefits: [
+            "Robotic Process Automation (RPA)",
+            "Workflow Integration",
+            "Chatbots & AI Agents",
+            "Legacy System Integration",
+        ],
+        techStack: [
+            { name: "UiPath", icon: "uipath", description: "RPA Platform" },
+            { name: "Zapier", icon: "zapier", description: "Integration" },
+            { name: "OpenAI API", icon: "openai", description: "AI Logic" },
         ],
         relatedCaseStudies: [],
     }

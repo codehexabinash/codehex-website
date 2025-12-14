@@ -91,7 +91,7 @@ export function TestimonialsSlider() {
     const visibleTestimonials = testimonials.slice(startIndex, startIndex + 3)
 
     return (
-        <section className="bg-background pt-0 pb-12 relative overflow-hidden">
+        <section className="bg-background pt-0 pb-12 relative overflow-hidden z-10">
             <div className="container px-4 text-center mb-16">
                 <motion.h2
                     initial={{ opacity: 0, y: 20 }}
