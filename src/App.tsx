@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { ThemeProvider } from "./context/theme-provider";
 import { MainLayout } from "./layouts/main-layout";
 import { Home } from "./pages/home";
@@ -8,7 +8,9 @@ import { CaseStudies } from "./pages/case-studies";
 import { About } from "./pages/about";
 import { Testimonials } from "./pages/testimonials";
 import { Blog } from "./pages/blog";
-import { AdminDashboard } from "./pages/admin/dashboard";
+import { AdminLogin } from "./pages/admin/login";
+import { LeadsPage } from "./pages/admin/leads";
+import { FeedbackPage } from "./pages/admin/feedback";
 
 function App() {
   return (
@@ -23,8 +25,13 @@ function App() {
             <Route path="about" element={<About />} />
             <Route path="testimonials" element={<Testimonials />} />
             <Route path="blog" element={<Blog />} />
-            <Route path="admin" element={<AdminDashboard />} />
           </Route>
+
+          {/* Admin Routes */}
+          <Route path="/admin" element={<Navigate to="/admin/leads" replace />} />
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin/leads" element={<LeadsPage />} />
+          <Route path="/admin/feedback" element={<FeedbackPage />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>

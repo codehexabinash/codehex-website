@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { motion } from "framer-motion"
-// import { supabase } from "../../lib/supabase"
+import { supabase } from "../../lib/supabase"
 import { Loader2, Send, Mail, Phone } from "lucide-react"
 
 interface ContactFormProps {
@@ -29,10 +29,40 @@ export function ContactForm({ embedded = false, serviceTitle }: ContactFormProps
         setStatus("idle")
 
         try {
-            await new Promise(resolve => setTimeout(resolve, 1500))
+            if (formMode === "project") {
+                const { error } = await supabase
+                    .from("leads")
+                    .insert([{
+                        name: formData.name,
+                        email: formData.email,
+                        phone: formData.phone || null,
+                        business_description: formData.business_description || null,
+                        requirements: formData.requirements || null,
+                        status: 'new'
+                    }] as any)
+                if (error) throw error
+            } else {
+                const { error } = await supabase
+                    .from("feedbacks")
+                    .insert([{
+                        name: formData.name,
+                        email: formData.email,
+                        subject: formData.subject || null,
+                        message: formData.message,
+                        status: 'unread'
+                    }] as any)
+                if (error) throw error
+            }
+
             setStatus("success")
             setFormData({
-                name: "", email: "", phone: "", business_description: "", requirements: "", subject: "", message: ""
+                name: "",
+                email: "",
+                phone: "",
+                business_description: "",
+                requirements: "",
+                subject: "",
+                message: ""
             })
         } catch (error) {
             console.error(error)
