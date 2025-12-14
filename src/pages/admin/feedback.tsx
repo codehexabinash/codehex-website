@@ -31,7 +31,7 @@ export function FeedbackPage() {
     async function toggleStatus(id: string, currentStatus: string) {
         try {
             const newStatus = currentStatus === 'unread' ? 'read' : 'unread'
-            await supabase.from("feedbacks").update({ status: newStatus } as any).eq("id", id)
+            await (supabase.from("feedbacks") as any).update({ status: newStatus }).eq("id", id)
             fetchFeedbacks()
         } catch (error) {
             console.error(error)
@@ -90,8 +90,8 @@ export function FeedbackPage() {
                                                 <button
                                                     onClick={() => toggleStatus(item.id, item.status)}
                                                     className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${item.status === 'unread'
-                                                            ? 'border-transparent bg-primary text-primary-foreground hover:bg-primary/80'
-                                                            : 'text-foreground hover:bg-muted'
+                                                        ? 'border-transparent bg-primary text-primary-foreground hover:bg-primary/80'
+                                                        : 'text-foreground hover:bg-muted'
                                                         }`}
                                                 >
                                                     {item.status === 'unread' ? 'Mark Read' : 'Read'}

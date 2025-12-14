@@ -30,7 +30,7 @@ export function LeadsPage() {
 
     async function updateStatus(id: string, status: string) {
         try {
-            await supabase.from("leads").update({ status } as any).eq("id", id)
+            await (supabase.from("leads") as any).update({ status }).eq("id", id)
             fetchLeads()
         } catch (error) {
             console.error(error)

@@ -26,7 +26,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
                 .from("profiles")
                 .select("role")
                 .eq("id", session.user.id)
-                .single()
+                .single() as any
 
             if (error || profile?.role !== "admin") {
                 console.error("Access denied:", error || "Not an admin")
