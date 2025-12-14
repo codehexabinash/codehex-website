@@ -85,27 +85,27 @@ export function HeroSection() {
     // Sizes: 'sm' = 4x4cm (w-40 h-40), 'md' = 6x6cm (w-60 h-60), 'lg' = 8x8cm (w-80 h-80)
     const cards = [
         // === ROW 1 (Top - y: 8%) ===
-        { icon: Terminal, label: "Bash", x: 10, y: -5, rot: -3, color: "bg-orange-500/10 text-orange-400", size: "md", className: "hidden md:flex" },
-        { icon: Code2, label: "React", x: -25, y: -42, rot: 2, color: "bg-blue-500/10 text-blue-400", size: "lg", className: "hidden sm:flex" },
+        { icon: Terminal, label: "Bash", x: 10, y: -5, rot: -3, color: "bg-orange-500/10 text-orange-400", size: "md", className: "flex" },
+        { icon: Code2, label: "React", x: -25, y: -42, rot: 2, color: "bg-blue-500/10 text-blue-400", size: "lg", className: "flex" },
         { icon: Database, label: "SQL", x: -20, y: 25, rot: -2, color: "bg-emerald-500/10 text-emerald-400", size: "sm", className: "flex" },
-        { icon: Sparkles, label: "AI", x: 115, y: -40, rot: 3, color: "bg-purple-500/10 text-purple-400", size: "md", className: "hidden lg:flex" },
+        { icon: Sparkles, label: "AI", x: 115, y: -40, rot: 3, color: "bg-purple-500/10 text-purple-400", size: "md", className: "flex" },
 
         // === ROW 2 (Upper-Middle - y: 36%) ===
-        { icon: Layout, label: "UI/UX", x: -34, y: 118, rot: 2, color: "bg-pink-500/10 text-pink-400", size: "sm", className: "hidden sm:flex" },
-        { icon: Package, label: "NPM", x: -25, y: 75, rot: -3, color: "bg-red-600/10 text-red-500", size: "lg", className: "hidden md:flex" },
+        { icon: Layout, label: "UI/UX", x: -34, y: 118, rot: 2, color: "bg-pink-500/10 text-pink-400", size: "sm", className: "flex" },
+        { icon: Package, label: "NPM", x: -25, y: 75, rot: -3, color: "bg-red-600/10 text-red-500", size: "lg", className: "flex" },
         { icon: Globe, label: "Web", x: 50, y: -30, rot: 3, color: "bg-cyan-500/10 text-cyan-400", size: "md", className: "flex" },
-        { icon: Shield, label: "Sec", x: 100, y: 20, rot: -2, color: "bg-red-500/10 text-red-400", size: "sm", className: "hidden sm:flex" },
+        { icon: Shield, label: "Sec", x: 100, y: 20, rot: -2, color: "bg-red-500/10 text-red-400", size: "sm", className: "flex" },
 
         // === ROW 3 (Lower-Middle - y: 64%) ===
         // { icon: Cpu, label: "API", x: -60, y: 64, rot: -3, color: "bg-indigo-500/10 text-indigo-400", size: "lg" },
-        { icon: Server, label: "Server", x: 120, y: 50, rot: 4, color: "bg-green-600/10 text-green-500", size: "sm", className: "hidden md:flex" },
+        { icon: Server, label: "Server", x: 120, y: 50, rot: 4, color: "bg-green-600/10 text-green-500", size: "sm", className: "flex" },
         { icon: Workflow, label: "Flow", x: 50, y: 64, rot: -2, color: "bg-violet-500/10 text-violet-400", size: "md", className: "flex" },
         // { icon: Zap, label: "Fast", x: 160, y: 64, rot: 3, color: "bg-yellow-500/10 text-yellow-400", size: "sm" },
 
         // === ROW 4 (Bottom - y: 92%) ===
-        { icon: GitBranch, label: "Git", x: 65, y: 110, rot: -4, color: "bg-orange-600/10 text-orange-500", size: "sm", className: "hidden sm:flex" },
+        { icon: GitBranch, label: "Git", x: 65, y: 110, rot: -4, color: "bg-orange-600/10 text-orange-500", size: "sm", className: "flex" },
         { icon: Cloud, label: "Cloud", x: 25, y: 110, rot: 2, color: "bg-sky-500/10 text-sky-400", size: "md", className: "flex" },
-        { icon: Blocks, label: "Docker", x: 110, y: 100, rot: -3, color: "bg-blue-600/10 text-blue-500", size: "lg", className: "hidden lg:flex" },
+        { icon: Blocks, label: "Docker", x: 110, y: 100, rot: -3, color: "bg-blue-600/10 text-blue-500", size: "lg", className: "flex" },
         // { icon: Settings, label: "DevOps", x: 160, y: 92, rot: 4, color: "bg-slate-500/10 text-slate-400", size: "md" }
     ]
 
@@ -124,20 +124,24 @@ export function HeroSection() {
             <div className="absolute inset-0 z-10 pointer-events-none">
                 {cards.map((card, i) => {
                     // Define size classes based on card size
+                    // On mobile, all cards scale down significantly to fit
+                    // sm sizes -> smaller on mobile
+                    // md sizes -> medium on mobile
+                    // lg sizes -> larger on mobile
                     const sizeClasses = {
-                        sm: 'w-40 h-40 p-5 gap-3',  // 4x4cm (~160px)
-                        md: 'w-60 h-60 p-7 gap-4',  // 6x6cm (~240px)
-                        lg: 'w-80 h-80 p-9 gap-5'   // 8x8cm (~320px)
+                        sm: 'w-20 h-20 sm:w-40 sm:h-40 p-2 sm:p-5 gap-1 sm:gap-3',
+                        md: 'w-28 h-28 sm:w-60 sm:h-60 p-3 sm:p-7 gap-2 sm:gap-4',
+                        lg: 'w-36 h-36 sm:w-80 sm:h-80 p-4 sm:p-9 gap-3 sm:gap-5'
                     }
                     const iconSizes = {
-                        sm: 'w-12 h-12',   // Small icon
-                        md: 'w-16 h-16',   // Medium icon
-                        lg: 'w-20 h-20'    // Large icon
+                        sm: 'w-6 h-6 sm:w-12 sm:h-12',
+                        md: 'w-8 h-8 sm:w-16 sm:h-16',
+                        lg: 'w-10 h-10 sm:w-20 sm:h-20'
                     }
                     const textSizes = {
-                        sm: 'text-xs',
-                        md: 'text-sm',
-                        lg: 'text-base'
+                        sm: 'text-[0.5rem] sm:text-xs',
+                        md: 'text-[0.6rem] sm:text-sm',
+                        lg: 'text-[0.7rem] sm:text-base'
                     }
 
                     return (
