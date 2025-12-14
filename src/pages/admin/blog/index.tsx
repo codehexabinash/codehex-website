@@ -3,12 +3,11 @@ import { AdminLayout } from "../../../components/admin/admin-layout"
 import { AuthGuard } from "../../../components/admin/auth-guard"
 import { supabase } from "../../../lib/supabase"
 import { Loader2, Plus, Pencil, Trash2, Eye, EyeOff, FileText, Calendar } from "lucide-react"
-import { Link, useNavigate } from "react-router-dom"
+import { Link } from "react-router-dom"
 
 export function BlogListPage() {
     const [posts, setPosts] = useState<any[]>([])
     const [isLoading, setIsLoading] = useState(true)
-    const navigate = useNavigate()
 
     useEffect(() => {
         fetchPosts()
@@ -111,8 +110,8 @@ export function BlogListPage() {
                                                 </td>
                                                 <td className="p-4 align-middle">
                                                     <div className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${post.published
-                                                            ? "border-transparent bg-green-500/15 text-green-600"
-                                                            : "border-transparent bg-yellow-500/15 text-yellow-600"
+                                                        ? "border-transparent bg-green-500/15 text-green-600"
+                                                        : "border-transparent bg-yellow-500/15 text-yellow-600"
                                                         }`}>
                                                         {post.published ? "Published" : "Draft"}
                                                     </div>

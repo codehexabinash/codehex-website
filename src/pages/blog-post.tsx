@@ -16,6 +16,8 @@ export function BlogPost() {
     }, [slug])
 
     async function fetchPost() {
+        if (!slug) return
+
         try {
             const { data, error } = await supabase
                 .from("blog_posts")

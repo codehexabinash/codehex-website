@@ -6,14 +6,23 @@ import { Loader2, Save, ArrowLeft, Image as ImageIcon, Trash2 } from "lucide-rea
 import { useNavigate, useParams, Link } from "react-router-dom"
 
 export function BlogEditorPage() {
-    const { id } = useParams()
+    const { id } = useParams<{ id: string }>()
     const navigate = useNavigate()
     const isEditing = !!id
 
     const [isLoading, setIsLoading] = useState(false)
     const [isFetching, setIsFetching] = useState(isEditing)
 
-    const [formData, setFormData] = useState({
+    interface BlogFormData {
+        title: string
+        slug: string
+        excerpt: string
+        content: string
+        cover_image: string
+        published: boolean
+    }
+
+    const [formData, setFormData] = useState<BlogFormData>({
         title: "",
         slug: "",
         excerpt: "",
@@ -29,6 +38,8 @@ export function BlogEditorPage() {
     }, [id])
 
     async function fetchPost() {
+        if (!id) return
+
         try {
             const { data, error } = await supabase
                 .from("blog_posts")
@@ -38,13 +49,14 @@ export function BlogEditorPage() {
 
             if (error) throw error
             if (data) {
+                const post = data as any
                 setFormData({
-                    title: data.title,
-                    slug: data.slug,
-                    excerpt: data.excerpt || "",
-                    content: data.content || "",
-                    cover_image: data.cover_image || "",
-                    published: data.published
+                    title: post.title,
+                    slug: post.slug,
+                    excerpt: post.excerpt || "",
+                    content: post.content || "",
+                    cover_image: post.cover_image || "",
+                    published: post.published
                 })
             }
         } catch (error) {
