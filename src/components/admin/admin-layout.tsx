@@ -56,8 +56,8 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
 
             {/* Sidebar */}
             <aside className={cn(
-                "fixed inset-y-0 left-0 z-50 w-64 flex-col border-r bg-background transition-transform duration-300 ease-in-out flex",
-                sidebarOpen ? "translate-x-0" : "-translate-x-full sm:translate-x-0"
+                "fixed inset-y-0 left-0 z-50 w-64 flex-col border-r bg-background transition-transform duration-300 ease-in-out sm:flex sm:translate-x-0",
+                sidebarOpen ? "flex translate-x-0" : "hidden -translate-x-full"
             )}>
                 <div className="flex h-16 items-center justify-between border-b px-6">
                     <div className="flex items-center gap-2">

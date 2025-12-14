@@ -71,83 +71,142 @@ export function BlogListPage() {
                         <Loader2 className="h-8 w-8 animate-spin text-primary" />
                     </div>
                 ) : (
-                    <div className="rounded-xl border bg-card text-card-foreground shadow">
-                        <div className="relative w-full overflow-auto">
-                            <table className="w-full caption-bottom text-sm text-left">
-                                <thead className="[&_tr]:border-b">
-                                    <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                                        <th className="h-12 px-4 align-middle font-medium text-muted-foreground">Title</th>
-                                        <th className="h-12 px-4 align-middle font-medium text-muted-foreground hidden md:table-cell">Date</th>
-                                        <th className="h-12 px-4 align-middle font-medium text-muted-foreground hidden lg:table-cell">Views</th>
-                                        <th className="h-12 px-4 align-middle font-medium text-muted-foreground">Status</th>
-                                        <th className="h-12 px-4 align-middle font-medium text-muted-foreground text-right">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="[&_tr:last-child]:border-0">
-                                    {posts.length === 0 ? (
-                                        <tr>
-                                            <td colSpan={5} className="p-8 text-center text-muted-foreground">
-                                                No posts found. Create your first one!
-                                            </td>
+                    <>
+                        {/* Mobile View: Cards */}
+                        <div className="grid gap-4 sm:hidden">
+                            {posts.map((post) => (
+                                <div key={post.id} className="rounded-xl border bg-card p-4 text-card-foreground shadow-sm space-y-3">
+                                    <div className="flex items-start justify-between">
+                                        <div className="flex items-center gap-2">
+                                            <FileText className="h-5 w-5 text-muted-foreground" />
+                                            <div className="font-semibold">{post.title}</div>
+                                        </div>
+                                        <div className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${post.published
+                                            ? "border-transparent bg-green-500/15 text-green-600"
+                                            : "border-transparent bg-yellow-500/15 text-yellow-600"
+                                            }`}>
+                                            {post.published ? "Pub" : "Draft"}
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center gap-4 text-xs text-muted-foreground border-t pt-2">
+                                        <div className="flex items-center gap-1">
+                                            <Calendar className="h-3 w-3" />
+                                            {new Date(post.created_at).toLocaleDateString()}
+                                        </div>
+                                        <div>
+                                            Views: {post.views || 0}
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center justify-end gap-2 border-t pt-2">
+                                        <button
+                                            onClick={() => togglePublish(post.id, post.published)}
+                                            className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-input bg-background text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
+                                        >
+                                            {post.published ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                        </button>
+                                        <Link
+                                            to={`/admin/blog/edit/${post.id}`}
+                                            className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-input bg-background text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground"
+                                        >
+                                            <Pencil className="h-4 w-4" />
+                                        </Link>
+                                        <button
+                                            onClick={() => deletePost(post.id)}
+                                            className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-input bg-background text-sm font-medium shadow-sm transition-colors hover:bg-red-500/10 hover:text-red-600"
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                            {posts.length === 0 && (
+                                <div className="p-8 text-center text-muted-foreground border rounded-xl bg-card">
+                                    No posts found.
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Desktop View: Table */}
+                        <div className="hidden rounded-xl border bg-card text-card-foreground shadow sm:block">
+                            <div className="relative w-full overflow-auto">
+                                <table className="w-full caption-bottom text-sm text-left">
+                                    <thead className="[&_tr]:border-b">
+                                        <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                                            <th className="h-12 px-4 align-middle font-medium text-muted-foreground">Title</th>
+                                            <th className="h-12 px-4 align-middle font-medium text-muted-foreground">Date</th>
+                                            <th className="h-12 px-4 align-middle font-medium text-muted-foreground">Views</th>
+                                            <th className="h-12 px-4 align-middle font-medium text-muted-foreground">Status</th>
+                                            <th className="h-12 px-4 align-middle font-medium text-muted-foreground text-right">Actions</th>
                                         </tr>
-                                    ) : (
-                                        posts.map((post) => (
-                                            <tr key={post.id} className="border-b transition-colors hover:bg-muted/50">
-                                                <td className="p-4 align-middle font-medium">
-                                                    <div className="flex items-center gap-2">
-                                                        <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
-                                                        <span className="truncate max-w-[150px] sm:max-w-xs">{post.title}</span>
-                                                    </div>
-                                                </td>
-                                                <td className="p-4 align-middle text-muted-foreground hidden md:table-cell">
-                                                    <div className="flex items-center gap-2">
-                                                        <Calendar className="h-3 w-3" />
-                                                        {new Date(post.created_at).toLocaleDateString()}
-                                                    </div>
-                                                </td>
-                                                <td className="p-4 align-middle text-muted-foreground hidden lg:table-cell">
-                                                    {post.views || 0}
-                                                </td>
-                                                <td className="p-4 align-middle">
-                                                    <div className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${post.published
-                                                        ? "border-transparent bg-green-500/15 text-green-600"
-                                                        : "border-transparent bg-yellow-500/15 text-yellow-600"
-                                                        }`}>
-                                                        {post.published ? "Published" : "Draft"}
-                                                    </div>
-                                                </td>
-                                                <td className="p-4 align-middle text-right">
-                                                    <div className="flex items-center justify-end gap-2">
-                                                        <button
-                                                            onClick={() => togglePublish(post.id, post.published)}
-                                                            className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-input bg-background text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                                                            title={post.published ? "Unpublish" : "Publish"}
-                                                        >
-                                                            {post.published ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                                                        </button>
-                                                        <Link
-                                                            to={`/admin/blog/edit/${post.id}`}
-                                                            className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-input bg-background text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                                                            title="Edit"
-                                                        >
-                                                            <Pencil className="h-4 w-4" />
-                                                        </Link>
-                                                        <button
-                                                            onClick={() => deletePost(post.id)}
-                                                            className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-input bg-background text-sm font-medium shadow-sm transition-colors hover:bg-red-500/10 hover:text-red-600 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                                                            title="Delete"
-                                                        >
-                                                            <Trash2 className="h-4 w-4" />
-                                                        </button>
-                                                    </div>
+                                    </thead>
+                                    <tbody className="[&_tr:last-child]:border-0">
+                                        {posts.length === 0 ? (
+                                            <tr>
+                                                <td colSpan={5} className="p-8 text-center text-muted-foreground">
+                                                    No posts found. Create your first one!
                                                 </td>
                                             </tr>
-                                        ))
-                                    )}
-                                </tbody>
-                            </table>
+                                        ) : (
+                                            posts.map((post) => (
+                                                <tr key={post.id} className="border-b transition-colors hover:bg-muted/50">
+                                                    <td className="p-4 align-middle font-medium">
+                                                        <div className="flex items-center gap-2">
+                                                            <FileText className="h-4 w-4 text-muted-foreground" />
+                                                            {post.title}
+                                                        </div>
+                                                    </td>
+                                                    <td className="p-4 align-middle text-muted-foreground">
+                                                        <div className="flex items-center gap-2">
+                                                            <Calendar className="h-3 w-3" />
+                                                            {new Date(post.created_at).toLocaleDateString()}
+                                                        </div>
+                                                    </td>
+                                                    <td className="p-4 align-middle text-muted-foreground">
+                                                        {post.views || 0}
+                                                    </td>
+                                                    <td className="p-4 align-middle">
+                                                        <div className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${post.published
+                                                            ? "border-transparent bg-green-500/15 text-green-600"
+                                                            : "border-transparent bg-yellow-500/15 text-yellow-600"
+                                                            }`}>
+                                                            {post.published ? "Published" : "Draft"}
+                                                        </div>
+                                                    </td>
+                                                    <td className="p-4 align-middle text-right">
+                                                        <div className="flex items-center justify-end gap-2">
+                                                            <button
+                                                                onClick={() => togglePublish(post.id, post.published)}
+                                                                className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-input bg-background text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                                                                title={post.published ? "Unpublish" : "Publish"}
+                                                            >
+                                                                {post.published ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                                            </button>
+                                                            <Link
+                                                                to={`/admin/blog/edit/${post.id}`}
+                                                                className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-input bg-background text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                                                                title="Edit"
+                                                            >
+                                                                <Pencil className="h-4 w-4" />
+                                                            </Link>
+                                                            <button
+                                                                onClick={() => deletePost(post.id)}
+                                                                className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-input bg-background text-sm font-medium shadow-sm transition-colors hover:bg-red-500/10 hover:text-red-600 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                                                                title="Delete"
+                                                            >
+                                                                <Trash2 className="h-4 w-4" />
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                    </div>
+                    </>
                 )}
             </AdminLayout>
         </AuthGuard>
