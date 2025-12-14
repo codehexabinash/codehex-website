@@ -1,5 +1,5 @@
 import { PageTransition } from "../components/layout/page-transition"
-import { TestimonialsSlider } from "../components/home/testimonials-slider"
+
 
 export function Testimonials() {
     return (
