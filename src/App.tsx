@@ -11,6 +11,9 @@ import { Blog } from "./pages/blog";
 import { AdminLogin } from "./pages/admin/login";
 import { LeadsPage } from "./pages/admin/leads";
 import { FeedbackPage } from "./pages/admin/feedback";
+import { BlogListPage } from "./pages/admin/blog/index";
+import { BlogEditorPage } from "./pages/admin/blog/editor";
+import { BlogPost } from "./pages/blog-post";
 
 function App() {
   return (
@@ -25,6 +28,7 @@ function App() {
             <Route path="about" element={<About />} />
             <Route path="testimonials" element={<Testimonials />} />
             <Route path="blog" element={<Blog />} />
+            <Route path="blog/:slug" element={<BlogPost />} />
           </Route>
 
           {/* Admin Routes */}
@@ -32,6 +36,9 @@ function App() {
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin/leads" element={<LeadsPage />} />
           <Route path="/admin/feedback" element={<FeedbackPage />} />
+          <Route path="/admin/blog" element={<BlogListPage />} />
+          <Route path="/admin/blog/new" element={<BlogEditorPage />} />
+          <Route path="/admin/blog/edit/:id" element={<BlogEditorPage />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>

@@ -1,5 +1,8 @@
+import { useEffect, useState } from "react"
+import { Link } from "react-router-dom"
 import { PageTransition } from "../components/layout/page-transition"
-import { Calendar, Clock, ArrowRight } from "lucide-react"
+import { Calendar, Clock, ArrowRight, Loader2 } from "lucide-react"
+import { supabase } from "../lib/supabase"
 
 export function Blog() {
     return (
@@ -20,75 +23,93 @@ export function Blog() {
 }
 
 function BlogGrid() {
-    const posts = [
-        {
-            id: 1,
-            title: "The Future of React: Server Components and Beyond",
-            excerpt: "Exploring the shift towards server-side rendering and what it means for frontend performance.",
-            date: "Dec 12, 2024",
-            readTime: "5 min read",
-            category: "Development",
-            image: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2070&auto=format&fit=crop"
-        },
-        {
-            id: 2,
-            title: "Designing for Accessibility in 2025",
-            excerpt: "Why inclusive design is not just a trend but a necessity for modern digital products.",
-            date: "Nov 28, 2024",
-            readTime: "4 min read",
-            category: "Design",
-            image: "https://images.unsplash.com/photo-1586717791821-3f44a5638d48?q=80&w=2070&auto=format&fit=crop"
-        },
-        {
-            id: 3,
-            title: "Scaling Node.js Applications for Enterprise",
-            excerpt: "Best practices for microservices architecture and managing high-load systems.",
-            date: "Nov 15, 2024",
-            readTime: "7 min read",
-            category: "Backend",
-            image: "https://images.unsplash.com/photo-1555099962-4199c345e5dd?q=80&w=2070&auto=format&fit=crop"
+    const [posts, setPosts] = useState<any[]>([])
+    const [isLoading, setIsLoading] = useState(true)
+
+    useEffect(() => {
+        fetchPosts()
+    }, [])
+
+    async function fetchPosts() {
+        try {
+            const { data, error } = await supabase
+                .from("blog_posts")
+                .select("*")
+                .eq("published", true)
+                .order("created_at", { ascending: false })
+
+            if (error) throw error
+            setPosts(data || [])
+        } catch (error) {
+            console.error(error)
+        } finally {
+            setIsLoading(false)
         }
-    ]
+    }
+
+    if (isLoading) {
+        return (
+            <div className="flex justify-center pb-20">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+        )
+    }
+
+    if (posts.length === 0) {
+        return (
+            <div className="text-center pb-20 text-muted-foreground">
+                <p>No posts published yet. Check back soon!</p>
+            </div>
+        )
+    }
 
     return (
         <div className="container px-4 pb-20">
             <div className="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                 {posts.map((post) => (
-                    <article key={post.id} className="group flex flex-col overflow-hidden rounded-2xl border border-border/50 bg-card transition-all hover:shadow-xl hover:-translate-y-1">
-                        <div className="aspect-video w-full overflow-hidden">
-                            <img
-                                src={post.image}
-                                alt={post.title}
-                                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                            />
-                        </div>
-                        <div className="flex flex-1 flex-col p-6">
-                            <div className="mb-4 flex items-center justify-between text-xs text-muted-foreground">
-                                <span className="rounded-full bg-primary/10 px-2.5 py-0.5 font-medium text-primary">
-                                    {post.category}
-                                </span>
-                                <div className="flex items-center gap-3">
-                                    <div className="flex items-center gap-1">
-                                        <Calendar className="h-3 w-3" />
-                                        {post.date}
+                    <Link to={`/blog/${post.slug}`} key={post.id} className="group flex flex-col overflow-hidden rounded-2xl border border-border/50 bg-card transition-all hover:shadow-xl hover:-translate-y-1 block">
+                        <article className="flex flex-col h-full">
+                            <div className="aspect-video w-full overflow-hidden bg-muted">
+                                {post.cover_image ? (
+                                    <img
+                                        src={post.cover_image}
+                                        alt={post.title}
+                                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                    />
+                                ) : (
+                                    <div className="h-full w-full flex items-center justify-center text-muted-foreground bg-secondary/30">
+                                        No Image
                                     </div>
-                                    <div className="flex items-center gap-1">
-                                        <Clock className="h-3 w-3" />
-                                        {post.readTime}
+                                )}
+                            </div>
+                            <div className="flex flex-1 flex-col p-6">
+                                <div className="mb-4 flex items-center justify-between text-xs text-muted-foreground">
+                                    <span className="rounded-full bg-primary/10 px-2.5 py-0.5 font-medium text-primary">
+                                        Blog
+                                    </span>
+                                    <div className="flex items-center gap-3">
+                                        <div className="flex items-center gap-1">
+                                            <Calendar className="h-3 w-3" />
+                                            {new Date(post.created_at).toLocaleDateString()}
+                                        </div>
+                                        <div className="flex items-center gap-1">
+                                            <Clock className="h-3 w-3" />
+                                            5 min read
+                                        </div>
                                     </div>
                                 </div>
+                                <h3 className="mb-2 text-xl font-bold leading-tight group-hover:text-primary transition-colors line-clamp-2">
+                                    {post.title}
+                                </h3>
+                                <p className="mb-4 flex-1 text-muted-foreground text-sm line-clamp-3">
+                                    {post.excerpt}
+                                </p>
+                                <div className="mt-auto flex items-center text-sm font-medium text-primary group-hover:underline">
+                                    Read Article <ArrowRight className="ml-1 h-4 w-4" />
+                                </div>
                             </div>
-                            <h3 className="mb-2 text-xl font-bold leading-tight group-hover:text-primary transition-colors">
-                                {post.title}
-                            </h3>
-                            <p className="mb-4 flex-1 text-muted-foreground text-sm">
-                                {post.excerpt}
-                            </p>
-                            <div className="mt-auto flex items-center text-sm font-medium text-primary group-hover:underline">
-                                Read Article <ArrowRight className="ml-1 h-4 w-4" />
-                            </div>
-                        </div>
-                    </article>
+                        </article>
+                    </Link>
                 ))}
             </div>
         </div>

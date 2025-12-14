@@ -1,4 +1,5 @@
-import { useRef } from "react"
+import { useEffect, useRef } from "react"
+import { Link } from "react-router-dom"
 import { motion, useMotionValue } from "framer-motion"
 import { FloatingCard } from "../ui/floating-card"
 import { ArrowRight, Code2, Database, Layout, Sparkles, Terminal, Globe, Shield, GitBranch, Cloud, Blocks, Package, Server, Workflow } from "lucide-react"
@@ -28,6 +29,55 @@ export function HeroSection() {
         mouseX.set(x)
         mouseY.set(y)
     }
+
+    // Mobile Gyro Effect
+    useEffect(() => {
+        const handleOrientation = (event: DeviceOrientationEvent) => {
+            const { beta, gamma } = event
+            if (beta === null || gamma === null) return
+
+            const { innerWidth, innerHeight } = window
+
+            // gamma: left-right tilt [-90, 90]
+            // beta: front-back tilt [-180, 180] 
+
+            // Map tilt to coordinate offsets
+            // Multiplier determines sensitivity (higher = more movement)
+            const x = gamma * 5 * (innerWidth / 100)
+
+            // Subtracting 45 from beta assumes natural holding position is ~45 degrees tilted back
+            const y = (beta - 45) * 5 * (innerHeight / 100)
+
+            mouseX.set(x)
+            mouseY.set(y)
+        }
+
+        // Request permission for iOS 13+ devices
+        const requestPermission = async () => {
+            if (
+                typeof DeviceOrientationEvent !== 'undefined' &&
+                typeof (DeviceOrientationEvent as any).requestPermission === 'function'
+            ) {
+                try {
+                    const permissionState = await (DeviceOrientationEvent as any).requestPermission()
+                    if (permissionState === 'granted') {
+                        window.addEventListener('deviceorientation', handleOrientation)
+                    }
+                } catch (error) {
+                    console.error("Gyro permission denied:", error)
+                }
+            } else {
+                // Non-iOS 13+ devices
+                window.addEventListener('deviceorientation', handleOrientation)
+            }
+        }
+
+        requestPermission()
+
+        return () => {
+            window.removeEventListener('deviceorientation', handleOrientation)
+        }
+    }, [])
 
     // 16 Cards Configuration - Uniform Grid Distribution with Varied Sizes
     // Fixed spacing: 4 columns x 4 rows covering entire panoramic area
@@ -134,13 +184,17 @@ export function HeroSection() {
                     </p>
 
                     <div className="mt-10 flex gap-4">
-                        <button className="group relative inline-flex h-12 items-center justify-center overflow-hidden rounded-full bg-primary px-8 font-medium text-primary-foreground transition-all hover:w-40 hover:bg-primary/90 min-w-[140px]">
-                            <span className="mr-2">Start Project</span>
-                            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                        </button>
-                        <button className="inline-flex h-12 items-center justify-center rounded-full border border-input bg-background/50 backdrop-blur-sm px-8 font-medium transition-colors hover:bg-accent hover:text-accent-foreground">
-                            View Work
-                        </button>
+                        <Link to="/contact">
+                            <button className="group relative inline-flex h-12 items-center justify-center overflow-hidden rounded-full bg-primary px-8 font-medium text-primary-foreground transition-all hover:w-40 hover:bg-primary/90 min-w-[140px]">
+                                <span className="mr-2">Start Project</span>
+                                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                            </button>
+                        </Link>
+                        <Link to="/case-studies">
+                            <button className="inline-flex h-12 items-center justify-center rounded-full border border-input bg-background/50 backdrop-blur-sm px-8 font-medium transition-colors hover:bg-accent hover:text-accent-foreground">
+                                View Work
+                            </button>
+                        </Link>
                     </div>
                 </motion.div>
             </div>

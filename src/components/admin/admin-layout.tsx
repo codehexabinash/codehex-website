@@ -1,11 +1,13 @@
 import { Link, useLocation, useNavigate } from "react-router-dom"
-import { LayoutDashboard, MessageSquare, FileText, LogOut, Users } from "lucide-react"
+import { LayoutDashboard, MessageSquare, FileText, LogOut, Users, Sun, Moon } from "lucide-react"
 import { supabase } from "../../lib/supabase"
 import { cn } from "../../lib/utils"
+import { useTheme } from "../../context/theme-provider"
 
 export function AdminLayout({ children }: { children: React.ReactNode }) {
     const location = useLocation()
     const navigate = useNavigate()
+    const { theme, setTheme } = useTheme()
 
     const handleLogout = async () => {
         await supabase.auth.signOut()
@@ -22,9 +24,18 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
         <div className="flex min-h-screen bg-muted/40 font-sans">
             {/* Sidebar */}
             <aside className="fixed inset-y-0 left-0 z-10 hidden w-64 flex-col border-r bg-background sm:flex">
-                <div className="flex h-16 items-center gap-2 border-b px-6">
-                    <LayoutDashboard className="h-6 w-6 text-primary" />
-                    <span className="font-bold text-lg">Admin Panel</span>
+                <div className="flex h-16 items-center justify-between border-b px-6">
+                    <div className="flex items-center gap-2">
+                        <LayoutDashboard className="h-6 w-6 text-primary" />
+                        <span className="font-bold text-lg">Admin Panel</span>
+                    </div>
+                    <button
+                        onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                        className="rounded-full p-2 text-muted-foreground hover:bg-muted hover:text-primary transition-colors"
+                        title="Toggle Theme"
+                    >
+                        {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+                    </button>
                 </div>
                 <nav className="flex flex-1 flex-col gap-2 p-4">
                     {navItems.map((item) => (

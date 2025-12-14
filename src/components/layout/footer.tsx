@@ -1,5 +1,6 @@
 import { Github, Linkedin, Twitter } from "lucide-react"
 import { motion } from "framer-motion"
+import { Link } from "react-router-dom"
 
 export function Footer() {
     return (
@@ -31,27 +32,27 @@ export function Footer() {
                         <div>
                             <h3 className="font-semibold text-lg mb-6">Services</h3>
                             <ul className="space-y-4 text-gray-400">
-                                <FooterLink>Web Development</FooterLink>
-                                <FooterLink>Mobile Apps</FooterLink>
-                                <FooterLink>Cloud Infrastructure</FooterLink>
-                                <FooterLink>UI/UX Design</FooterLink>
+                                <FooterLink to="/services">Web Development</FooterLink>
+                                <FooterLink to="/services">Mobile Apps</FooterLink>
+                                <FooterLink to="/services">Cloud Infrastructure</FooterLink>
+                                <FooterLink to="/services">UI/UX Design</FooterLink>
                             </ul>
                         </div>
                         <div>
                             <h3 className="font-semibold text-lg mb-6">Company</h3>
                             <ul className="space-y-4 text-gray-400">
-                                <FooterLink>About Us</FooterLink>
-                                <FooterLink>Careers</FooterLink>
-                                <FooterLink>Blog</FooterLink>
-                                <FooterLink>Contact</FooterLink>
+                                <FooterLink to="/about">About Us</FooterLink>
+                                <FooterLink to="/about">Careers</FooterLink>
+                                <FooterLink to="/blog">Blog</FooterLink>
+                                <FooterLink to="/contact">Contact</FooterLink>
                             </ul>
                         </div>
                         <div className="col-span-2 md:col-span-1">
                             <h3 className="font-semibold text-lg mb-6">Let's Talk</h3>
                             <p className="text-gray-400 mb-4">Have an idea?</p>
-                            <a href="#" className="inline-block bg-white text-black px-6 py-2 rounded-full font-medium hover:bg-gray-200 transition-colors">
+                            <Link to="/contact" className="inline-block bg-white text-black px-6 py-2 rounded-full font-medium hover:bg-gray-200 transition-colors">
                                 Start Project
-                            </a>
+                            </Link>
                         </div>
                     </div>
                 </div>
@@ -81,10 +82,12 @@ function SocialLink({ icon: Icon, href }: { icon: any, href: string }) {
     )
 }
 
-function FooterLink({ children }: { children: React.ReactNode }) {
+function FooterLink({ to, children }: { to: string, children: React.ReactNode }) {
     return (
-        <li className="hover:text-white hover:translate-x-1 transition-all cursor-pointer">
-            {children}
+        <li>
+            <Link to={to} className="hover:text-white hover:translate-x-1 transition-all inline-block w-full">
+                {children}
+            </Link>
         </li>
     )
 }

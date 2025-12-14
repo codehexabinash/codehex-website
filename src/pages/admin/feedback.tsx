@@ -38,12 +38,23 @@ export function FeedbackPage() {
         }
     }
 
+    async function toggleApproval(id: string, currentApproved: boolean) {
+        try {
+            const newApproved = !currentApproved
+            // Update approved status
+            await (supabase.from("feedbacks") as any).update({ approved: newApproved }).eq("id", id)
+            fetchFeedbacks()
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
     return (
         <AuthGuard>
             <AdminLayout>
                 <div className="mb-8">
-                    <h1 className="text-3xl font-bold tracking-tight">Feedback</h1>
-                    <p className="text-muted-foreground">Listen to your users</p>
+                    <h1 className="text-3xl font-bold tracking-tight">Feedback & Testimonials</h1>
+                    <p className="text-muted-foreground">Manage user feedback and approve testimonials</p>
                 </div>
 
                 {isLoading ? (
@@ -57,36 +68,55 @@ export function FeedbackPage() {
                                 <thead className="[&_tr]:border-b">
                                     <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
                                         <th className="h-12 px-4 align-middle font-medium text-muted-foreground">Date</th>
-                                        <th className="h-12 px-4 align-middle font-medium text-muted-foreground">From</th>
+                                        <th className="h-12 px-4 align-middle font-medium text-muted-foreground">User</th>
+                                        <th className="h-12 px-4 align-middle font-medium text-muted-foreground">Company</th>
+                                        <th className="h-12 px-4 align-middle font-medium text-muted-foreground">Role</th>
+                                        <th className="h-12 px-4 align-middle font-medium text-muted-foreground">Subject</th>
                                         <th className="h-12 px-4 align-middle font-medium text-muted-foreground">Message</th>
                                         <th className="h-12 px-4 align-middle font-medium text-muted-foreground">Status</th>
+                                        <th className="h-12 px-4 align-middle font-medium text-muted-foreground">Testimonial</th>
                                     </tr>
                                 </thead>
                                 <tbody className="[&_tr:last-child]:border-0">
                                     {feedbacks.map((item) => (
                                         <tr key={item.id} className={`border-b transition-colors hover:bg-muted/50 ${item.status === 'unread' ? 'bg-primary/5' : ''}`}>
-                                            <td className="p-4 align-top">
-                                                <div className="flex items-center gap-2 text-muted-foreground whitespace-nowrap">
+                                            <td className="p-4 align-top whitespace-nowrap">
+                                                <div className="flex items-center gap-2 text-muted-foreground">
                                                     <Calendar className="h-3 w-3" />
                                                     {new Date(item.created_at).toLocaleDateString()}
                                                 </div>
                                             </td>
                                             <td className="p-4 align-top">
-                                                <div className="font-medium">{item.name}</div>
-                                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                                    <Mail className="h-3 w-3" />
-                                                    {item.email}
+                                                <div className="flex items-center gap-3">
+                                                    {item.image_url ? (
+                                                        <img src={item.image_url} alt={item.name} className="h-10 w-10 rounded-full object-cover" />
+                                                    ) : (
+                                                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary font-bold">
+                                                            {item.name.charAt(0)}
+                                                        </div>
+                                                    )}
+                                                    <div>
+                                                        <div className="font-medium whitespace-nowrap">{item.name}</div>
+                                                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                                            <Mail className="h-3 w-3" />
+                                                            {item.email}
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </td>
-                                            <td className="p-4 align-top max-w-lg">
-                                                <div className="space-y-1">
-                                                    {item.subject && (
-                                                        <div className="font-semibold text-foreground">{item.subject}</div>
-                                                    )}
-                                                    <p className="text-muted-foreground">{item.message}</p>
-                                                </div>
+                                            <td className="p-4 align-top whitespace-nowrap">
+                                                {item.company || "-"}
+                                            </td>
+                                            <td className="p-4 align-top whitespace-nowrap">
+                                                {item.role || "-"}
                                             </td>
                                             <td className="p-4 align-top">
+                                                {item.subject || "-"}
+                                            </td>
+                                            <td className="p-4 align-top min-w-[300px]">
+                                                <p className="text-muted-foreground text-sm line-clamp-3">{item.message}</p>
+                                            </td>
+                                            <td className="p-4 align-top whitespace-nowrap">
                                                 <button
                                                     onClick={() => toggleStatus(item.id, item.status)}
                                                     className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${item.status === 'unread'
@@ -96,6 +126,22 @@ export function FeedbackPage() {
                                                 >
                                                     {item.status === 'unread' ? 'Mark Read' : 'Read'}
                                                 </button>
+                                            </td>
+                                            <td className="p-4 align-top whitespace-nowrap">
+                                                <div className="flex items-center gap-2">
+                                                    <label className="relative inline-flex items-center cursor-pointer">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={item.approved || false}
+                                                            onChange={() => toggleApproval(item.id, item.approved || false)}
+                                                            className="sr-only peer"
+                                                        />
+                                                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-green-600"></div>
+                                                        <span className="ml-3 text-sm font-medium">
+                                                            {item.approved ? "Approved" : "Hidden"}
+                                                        </span>
+                                                    </label>
+                                                </div>
                                             </td>
                                         </tr>
                                     ))}

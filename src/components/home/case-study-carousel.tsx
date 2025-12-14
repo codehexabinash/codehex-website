@@ -42,7 +42,7 @@ const Card = ({ title, description, image, category, color, progress, range, tar
     const y = isLast ? lastCardY : yTransform
 
     return (
-        <div ref={container} className="flex h-[80vh] items-center justify-center sticky top-48 sm:h-screen">
+        <div ref={container} className="flex h-[80vh] items-center justify-center sticky top-20 sm:top-24 sm:h-screen">
             <motion.div
                 style={{
                     scale,
@@ -52,7 +52,7 @@ const Card = ({ title, description, image, category, color, progress, range, tar
                     opacity,
                     y
                 }}
-                className="relative flex h-[420px] w-full flex-col justify-between overflow-hidden rounded-3xl border border-white/10 p-4 shadow-2xl sm:h-[600px] md:h-[650px] lg:h-[700px] md:flex-row md:p-12 origin-top"
+                className="relative flex h-[60vh] min-h-[450px] w-full flex-col justify-between overflow-hidden rounded-3xl border border-black dark:border-white p-4 shadow-2xl sm:h-[75vh] md:h-[80vh] max-h-[700px] md:flex-row md:p-12 origin-top"
             >
                 <div className="flex flex-col justify-between md:w-[40%]">
                     <div>

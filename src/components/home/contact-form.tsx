@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { motion } from "framer-motion"
 import { supabase } from "../../lib/supabase"
-import { Loader2, Send, Mail, Phone } from "lucide-react"
+import { Loader2, Send, Mail, Phone, Upload, X } from "lucide-react"
 
 interface ContactFormProps {
     embedded?: boolean
@@ -12,6 +12,9 @@ export function ContactForm({ embedded = false, serviceTitle }: ContactFormProps
     const [formMode, setFormMode] = useState<"project" | "feedback">("project")
     const [isLoading, setIsLoading] = useState(false)
     const [status, setStatus] = useState<"idle" | "success" | "error">("idle")
+    const [selectedFile, setSelectedFile] = useState<File | null>(null)
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+
     const [formData, setFormData] = useState({
         name: "",
         email: "",
@@ -19,9 +22,41 @@ export function ContactForm({ embedded = false, serviceTitle }: ContactFormProps
         business_description: "",
         requirements: serviceTitle ? `I'm interested in ${serviceTitle} services.` : "",
         // Feedback specific fields
-        subject: "",
+        company: "",
+        role: "",
         message: ""
     })
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0]
+            setSelectedFile(file)
+            setPreviewUrl(URL.createObjectURL(file))
+        }
+    }
+
+    const clearFile = () => {
+        setSelectedFile(null)
+        setPreviewUrl(null)
+    }
+
+    const uploadImage = async (file: File) => {
+        const fileExt = file.name.split('.').pop()
+        const fileName = `${Math.random()}.${fileExt}`
+        const filePath = `${fileName}`
+
+        const { error: uploadError } = await supabase.storage
+            .from('testimonial-images')
+            .upload(filePath, file)
+
+        if (uploadError) throw uploadError
+
+        const { data } = supabase.storage
+            .from('testimonial-images')
+            .getPublicUrl(filePath)
+
+        return data.publicUrl
+    }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -42,14 +77,22 @@ export function ContactForm({ embedded = false, serviceTitle }: ContactFormProps
                     }] as any)
                 if (error) throw error
             } else {
+                let imageUrl = null
+                if (selectedFile) {
+                    imageUrl = await uploadImage(selectedFile)
+                }
+
                 const { error } = await supabase
                     .from("feedbacks")
                     .insert([{
                         name: formData.name,
                         email: formData.email,
-                        subject: formData.subject || null,
+                        company: formData.company || null,
+                        role: formData.role || null,
+                        image_url: imageUrl,
                         message: formData.message,
-                        status: 'unread'
+                        status: 'unread',
+                        approved: false
                     }] as any)
                 if (error) throw error
             }
@@ -61,9 +104,11 @@ export function ContactForm({ embedded = false, serviceTitle }: ContactFormProps
                 phone: "",
                 business_description: "",
                 requirements: "",
-                subject: "",
+                company: "",
+                role: "",
                 message: ""
             })
+            clearFile()
         } catch (error) {
             console.error(error)
             setStatus("error")
@@ -211,37 +256,55 @@ export function ContactForm({ embedded = false, serviceTitle }: ContactFormProps
                             </div>
                         ) : (
                             <div className="space-y-2">
-                                <label htmlFor="subject" className="ml-1 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                                    Subject
+                                <label htmlFor="company" className="ml-1 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                    Company (Optional)
                                 </label>
                                 <input
-                                    required
                                     type="text"
-                                    id="subject"
-                                    name="subject"
-                                    value={formData.subject}
+                                    id="company"
+                                    name="company"
+                                    value={formData.company}
                                     onChange={handleChange}
-                                    placeholder="Suggestion, Bug, Applause..."
+                                    placeholder="Acme Inc."
                                     className="flex h-12 w-full rounded-xl border border-input bg-background/50 px-4 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all focus:border-primary/50"
                                 />
                             </div>
                         )}
                     </div>
 
-                    <div className="space-y-2">
-                        <label htmlFor="email" className="ml-1 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                            Email
-                        </label>
-                        <input
-                            required
-                            type="email"
-                            id="email"
-                            name="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            placeholder="john@company.com"
-                            className="flex h-12 w-full rounded-xl border border-input bg-background/50 px-4 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all focus:border-primary/50"
-                        />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                            <label htmlFor="email" className="ml-1 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                Email
+                            </label>
+                            <input
+                                required
+                                type="email"
+                                id="email"
+                                name="email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                placeholder="john@company.com"
+                                className="flex h-12 w-full rounded-xl border border-input bg-background/50 px-4 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all focus:border-primary/50"
+                            />
+                        </div>
+
+                        {formMode === "feedback" && (
+                            <div className="space-y-2">
+                                <label htmlFor="role" className="ml-1 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                    Role (Optional)
+                                </label>
+                                <input
+                                    type="text"
+                                    id="role"
+                                    name="role"
+                                    value={formData.role}
+                                    onChange={handleChange}
+                                    placeholder="CEO / Director"
+                                    className="flex h-12 w-full rounded-xl border border-input bg-background/50 px-4 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all focus:border-primary/50"
+                                />
+                            </div>
+                        )}
                     </div>
 
                     {formMode === "project" ? (
@@ -277,20 +340,53 @@ export function ContactForm({ embedded = false, serviceTitle }: ContactFormProps
                             </div>
                         </>
                     ) : (
-                        <div className="space-y-2">
-                            <label htmlFor="message" className="ml-1 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                                Your Message
-                            </label>
-                            <textarea
-                                required
-                                id="message"
-                                name="message"
-                                value={formData.message}
-                                onChange={handleChange}
-                                placeholder="How can we improve? What's on your mind?"
-                                className="flex min-h-[150px] w-full rounded-xl border border-input bg-background/50 px-4 py-3 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-y transition-all focus:border-primary/50"
-                            />
-                        </div>
+                        <>
+                            <div className="space-y-2">
+                                <label htmlFor="photo" className="ml-1 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                    Photo (Optional)
+                                </label>
+                                <div className="flex items-center gap-4">
+                                    {previewUrl ? (
+                                        <div className="relative h-16 w-16 rounded-full overflow-hidden border border-border">
+                                            <img src={previewUrl} alt="Preview" className="h-full w-full object-cover" />
+                                            <button
+                                                type="button"
+                                                onClick={clearFile}
+                                                className="absolute inset-0 flex items-center justify-center bg-black/50 text-white opacity-0 hover:opacity-100 transition-opacity"
+                                            >
+                                                <X className="h-4 w-4" />
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center border border-dashed border-muted-foreground/30">
+                                            <Upload className="h-6 w-6 text-muted-foreground" />
+                                        </div>
+                                    )}
+                                    <input
+                                        type="file"
+                                        id="photo"
+                                        accept="image/*"
+                                        onChange={handleFileChange}
+                                        className="flex h-12 w-full rounded-xl border border-input bg-background/50 px-4 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all focus:border-primary/50 pt-3"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label htmlFor="message" className="ml-1 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                    Your Message
+                                </label>
+                                <textarea
+                                    required
+                                    id="message"
+                                    name="message"
+                                    value={formData.message}
+                                    onChange={handleChange}
+                                    placeholder="How can we improve? What's on your mind?"
+                                    className="flex min-h-[150px] w-full rounded-xl border border-input bg-background/50 px-4 py-3 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-y transition-all focus:border-primary/50"
+                                />
+                            </div>
+                        </>
                     )}
 
                     <div className="pt-4">
@@ -306,7 +402,7 @@ export function ContactForm({ embedded = false, serviceTitle }: ContactFormProps
                                 </>
                             ) : (
                                 <>
-                                    {formMode === "project" ? "Send Project Request" : "Send Feedback"}
+                                    {formMode === "project" ? "Send Project Request" : "Send Feedbacks"}
                                     <Send className="ml-2 h-4 w-4" />
                                 </>
                             )}

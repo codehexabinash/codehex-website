@@ -1,5 +1,7 @@
+import { useEffect, useState } from "react"
 import { PageTransition } from "../components/layout/page-transition"
-
+import { Quote, Loader2 } from "lucide-react"
+import { supabase } from "../lib/supabase"
 
 export function Testimonials() {
     return (
@@ -13,12 +15,6 @@ export function Testimonials() {
                         Hear from the visionary leaders and companies we've had the privilege to work with.
                     </p>
                 </div>
-                {/* Reusing the slider component but modifying it slightly usually, 
-                    or for now just reusing it as it contains the data. 
-                    Ideally we would map all testimonials in a grid here.
-                    For MVP speed request, I will reuse the slider and maybe add a grid below if needed, 
-                    but let's make a grid view for the dedicated page. 
-                */}
                 <TestimonialsGrid />
             </div>
         </PageTransition>
@@ -26,86 +22,84 @@ export function Testimonials() {
 }
 
 function TestimonialsGrid() {
-    // Reusing data from slider would be best by exporting it, 
-    // but to avoid massive refactors right now I'll duplicate/adapt the data list 
-    // or arguably better, I can just mock it here for the new page.
+    const [testimonials, setTestimonials] = useState<any[]>([])
+    const [isLoading, setIsLoading] = useState(true)
 
-    // Let's grab the data from the slider if possible or just use the same set.
-    // I will duplicate for safety and speed as user wants "direct go for code" 
+    useEffect(() => {
+        fetchTestimonials()
+    }, [])
 
-    const testimonials = [
-        {
-            id: 1,
-            quote: "CodeHex transformed our digital presence. Their attention to detail and technical expertise is unmatched.",
-            author: "Sarah Johnson",
-            role: "CTO, FinTech Solutions",
-            initials: "SJ",
-            gradient: "from-blue-500 to-cyan-500"
-        },
-        {
-            id: 2,
-            quote: "The team delivered our mobile app ahead of schedule. The performance improvements exceeded all expectations.",
-            author: "Michael Chen",
-            role: "Founder, ShopEasy",
-            initials: "MC",
-            gradient: "from-purple-500 to-pink-500"
-        },
-        // ... adding more for a full page feel
-        {
-            id: 3,
-            quote: "Professional, creative, and reliable. They are the strategic partner you want for complex software projects.",
-            author: "Emily Davis",
-            role: "Director, HealthTech Inc.",
-            initials: "ED",
-            gradient: "from-green-500 to-emerald-500"
-        },
-        {
-            id: 4,
-            quote: "Our operational efficiency increased by 40% thanks to their custom automation tools. Simply brilliant.",
-            author: "Robert Chang",
-            role: "VP, Global Logistics",
-            initials: "RC",
-            gradient: "from-orange-500 to-red-500"
-        },
-        {
-            id: 5,
-            quote: "Secure, scalable, and stunning. They built exactly what we needed for our next-gen banking portal.",
-            author: "Amanda Williams",
-            role: "Head of Digital, Prime Bank",
-            initials: "AW",
-            gradient: "from-indigo-500 to-blue-500"
-        },
-        {
-            id: 6,
-            quote: "A game-changer for our manufacturing line. The IoT dashboard is intuitive, fast, and reliable.",
-            author: "Thomas Brown",
-            role: "Ops Manager, BuildRight",
-            initials: "TB",
-            gradient: "from-yellow-500 to-orange-500"
-        },
-    ]
+    async function fetchTestimonials() {
+        try {
+            const { data } = await supabase
+                .from("feedbacks")
+                .select("*")
+                .eq("approved", true)
+                .order("created_at", { ascending: false })
+
+            if (data) {
+                setTestimonials(data)
+            }
+        } catch (error) {
+            console.error(error)
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    if (isLoading) {
+        return (
+            <div className="flex justify-center pb-20">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+        )
+    }
+
+    const displayTestimonials = testimonials.length > 0
+        ? testimonials
+        : [
+            { id: 'p1', message: "Waiting for your feedback...", name: "Future Client", subject: "Company", image_url: null },
+            { id: 'p2', message: "Join our list of happy clients.", name: "Your Name", subject: "CEO", image_url: null },
+            { id: 'p3', message: "We'd love to hear from you.", name: "Partner", subject: "Director", image_url: null }
+        ]
 
     return (
         <div className="container px-4 pb-20">
             <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-                {testimonials.map((testimonial) => (
+                {displayTestimonials.map((testimonial) => (
                     <div
                         key={testimonial.id}
-                        className="group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-border/50 bg-card/50 p-8 shadow-sm transition-all hover:shadow-xl hover:-translate-y-2"
+                        className="group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-black dark:border-white bg-card/50 p-8 shadow-sm transition-all hover:shadow-xl hover:-translate-y-2 lg:min-h-[350px]"
                     >
-                        <div className={`absolute top-0 left-0 h-1 w-full bg-gradient-to-r ${testimonial.gradient}`} />
+                        <div className="absolute top-0 left-0 h-1 w-full bg-gradient-to-r from-primary to-purple-500" />
+
                         <div>
+                            <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-300">
+                                <Quote className="h-6 w-6 fill-current" />
+                            </div>
                             <blockquote className="mb-6 text-lg font-medium leading-relaxed text-card-foreground">
-                                "{testimonial.quote}"
+                                "{testimonial.message}"
                             </blockquote>
                         </div>
                         <div className="flex items-center gap-4 mt-auto">
-                            <div className={`h-10 w-10 flex items-center justify-center rounded-full bg-gradient-to-br ${testimonial.gradient} text-white font-bold text-sm shadow-md`}>
-                                {testimonial.initials}
-                            </div>
+                            {testimonial.image_url ? (
+                                <img
+                                    src={testimonial.image_url}
+                                    alt={testimonial.name}
+                                    className="h-12 w-12 rounded-full object-cover shadow-md"
+                                />
+                            ) : (
+                                <div className="h-12 w-12 flex items-center justify-center rounded-full bg-gradient-to-br from-primary to-purple-600 text-white font-bold text-lg shadow-md">
+                                    {testimonial.name.charAt(0)}
+                                </div>
+                            )}
                             <div>
-                                <div className="font-bold text-base text-foreground">{testimonial.author}</div>
-                                <div className="text-xs text-muted-foreground">{testimonial.role}</div>
+                                <div className="font-bold text-base text-foreground">{testimonial.name}</div>
+                                <div className="text-xs text-muted-foreground">
+                                    {testimonial.company}
+                                    {testimonial.company && testimonial.role && " - "}
+                                    {testimonial.role}
+                                </div>
                             </div>
                         </div>
                     </div>
