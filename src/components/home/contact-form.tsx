@@ -9,6 +9,7 @@ interface ContactFormProps {
 }
 
 export function ContactForm({ embedded = false, serviceTitle }: ContactFormProps) {
+    const [formMode, setFormMode] = useState<"project" | "feedback">("project")
     const [isLoading, setIsLoading] = useState(false)
     const [status, setStatus] = useState<"idle" | "success" | "error">("idle")
     const [formData, setFormData] = useState({
@@ -16,7 +17,10 @@ export function ContactForm({ embedded = false, serviceTitle }: ContactFormProps
         email: "",
         phone: "",
         business_description: "",
-        requirements: serviceTitle ? `I'm interested in ${serviceTitle} services.` : ""
+        requirements: serviceTitle ? `I'm interested in ${serviceTitle} services.` : "",
+        // Feedback specific fields
+        subject: "",
+        message: ""
     })
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -25,25 +29,13 @@ export function ContactForm({ embedded = false, serviceTitle }: ContactFormProps
         setStatus("idle")
 
         try {
-            // Simulate network delay
             await new Promise(resolve => setTimeout(resolve, 1500))
-
-            // Mock success for demonstration
-            // const { error } = await supabase
-            //     .from("contacts")
-            //     .insert([formData])
-            // if (error) throw error
-
             setStatus("success")
             setFormData({
-                name: "",
-                email: "",
-                phone: "",
-                business_description: "",
-                requirements: ""
+                name: "", email: "", phone: "", business_description: "", requirements: "", subject: "", message: ""
             })
         } catch (error) {
-            console.error("Error submitting form:", error)
+            console.error(error)
             setStatus("error")
         } finally {
             setIsLoading(false)
@@ -62,21 +54,22 @@ export function ContactForm({ embedded = false, serviceTitle }: ContactFormProps
             {!embedded && (
                 <div className="text-center mb-16">
                     <motion.h2
+                        key={formMode}
                         initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
+                        animate={{ opacity: 1, y: 0 }}
                         className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl mb-4"
                     >
-                        Start Your Project
+                        {formMode === "project" ? "Start Your Project" : "We Value Your Feedback"}
                     </motion.h2>
                     <motion.p
+                        key={`${formMode}-desc`}
                         initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: 0.1 }}
+                        animate={{ opacity: 1, y: 0 }}
                         className="text-muted-foreground text-lg"
                     >
-                        Ready to transform your ideas into reality? Let's build something amazing together.
+                        {formMode === "project"
+                            ? "Ready to transform your ideas into reality? Let's build something amazing together."
+                            : "Help us improve or just say hello. We read every message."}
                     </motion.p>
 
                     <motion.div
@@ -121,6 +114,37 @@ export function ContactForm({ embedded = false, serviceTitle }: ContactFormProps
                     </>
                 )}
 
+                {/* Mode Toggle */}
+                <div className="flex justify-center mb-8 relative z-10">
+                    <div className="bg-muted/50 p-1 rounded-full flex relative">
+                        {/* Sliding background pill */}
+                        <motion.div
+                            className="absolute top-1 bottom-1 bg-background rounded-full shadow-sm z-0"
+                            initial={false}
+                            animate={{
+                                left: formMode === "project" ? "4px" : "50%",
+                                width: "calc(50% - 4px)",
+                                x: formMode === "project" ? 0 : 0
+                            }}
+                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setFormMode("project")}
+                            className={`relative z-10 px-6 py-2 rounded-full text-sm font-medium transition-colors duration-200 ${formMode === "project" ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                        >
+                            Start Project
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setFormMode("feedback")}
+                            className={`relative z-10 px-6 py-2 rounded-full text-sm font-medium transition-colors duration-200 ${formMode === "feedback" ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                        >
+                            Give Feedback
+                        </button>
+                    </div>
+                </div>
+
                 <form onSubmit={handleSubmit} className="relative space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
@@ -138,21 +162,40 @@ export function ContactForm({ embedded = false, serviceTitle }: ContactFormProps
                                 className="flex h-12 w-full rounded-xl border border-input bg-background/50 px-4 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all focus:border-primary/50"
                             />
                         </div>
-                        <div className="space-y-2">
-                            <label htmlFor="phone" className="ml-1 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                                Phone
-                            </label>
-                            <input
-                                required
-                                type="tel"
-                                id="phone"
-                                name="phone"
-                                value={formData.phone}
-                                onChange={handleChange}
-                                placeholder="+1 (555) 000-0000"
-                                className="flex h-12 w-full rounded-xl border border-input bg-background/50 px-4 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all focus:border-primary/50"
-                            />
-                        </div>
+
+                        {formMode === "project" ? (
+                            <div className="space-y-2">
+                                <label htmlFor="phone" className="ml-1 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                    Phone
+                                </label>
+                                <input
+                                    required
+                                    type="tel"
+                                    id="phone"
+                                    name="phone"
+                                    value={formData.phone}
+                                    onChange={handleChange}
+                                    placeholder="+1 (555) 000-0000"
+                                    className="flex h-12 w-full rounded-xl border border-input bg-background/50 px-4 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all focus:border-primary/50"
+                                />
+                            </div>
+                        ) : (
+                            <div className="space-y-2">
+                                <label htmlFor="subject" className="ml-1 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                    Subject
+                                </label>
+                                <input
+                                    required
+                                    type="text"
+                                    id="subject"
+                                    name="subject"
+                                    value={formData.subject}
+                                    onChange={handleChange}
+                                    placeholder="Suggestion, Bug, Applause..."
+                                    className="flex h-12 w-full rounded-xl border border-input bg-background/50 px-4 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all focus:border-primary/50"
+                                />
+                            </div>
+                        )}
                     </div>
 
                     <div className="space-y-2">
@@ -171,35 +214,54 @@ export function ContactForm({ embedded = false, serviceTitle }: ContactFormProps
                         />
                     </div>
 
-                    <div className="space-y-2">
-                        <label htmlFor="business_description" className="ml-1 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                            Business Description
-                        </label>
-                        <textarea
-                            required
-                            id="business_description"
-                            name="business_description"
-                            value={formData.business_description}
-                            onChange={handleChange}
-                            placeholder="Tell us about your company and what you do..."
-                            className="flex min-h-[100px] w-full rounded-xl border border-input bg-background/50 px-4 py-3 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-y transition-all focus:border-primary/50"
-                        />
-                    </div>
+                    {formMode === "project" ? (
+                        <>
+                            <div className="space-y-2">
+                                <label htmlFor="business_description" className="ml-1 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                    Business Description
+                                </label>
+                                <textarea
+                                    required
+                                    id="business_description"
+                                    name="business_description"
+                                    value={formData.business_description}
+                                    onChange={handleChange}
+                                    placeholder="Tell us about your company and what you do..."
+                                    className="flex min-h-[100px] w-full rounded-xl border border-input bg-background/50 px-4 py-3 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-y transition-all focus:border-primary/50"
+                                />
+                            </div>
 
-                    <div className="space-y-2">
-                        <label htmlFor="requirements" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                            Project Requirements
-                        </label>
-                        <textarea
-                            required
-                            id="requirements"
-                            name="requirements"
-                            value={formData.requirements}
-                            onChange={handleChange}
-                            placeholder="What validation do you need? Specific features, timeline, etc."
-                            className="flex min-h-[120px] w-full rounded-xl border border-input bg-background/50 px-4 py-3 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-y transition-all focus:border-primary/50"
-                        />
-                    </div>
+                            <div className="space-y-2">
+                                <label htmlFor="requirements" className="ml-1 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                    Project Requirements
+                                </label>
+                                <textarea
+                                    required
+                                    id="requirements"
+                                    name="requirements"
+                                    value={formData.requirements}
+                                    onChange={handleChange}
+                                    placeholder="What validation do you need? Specific features, timeline, etc."
+                                    className="flex min-h-[120px] w-full rounded-xl border border-input bg-background/50 px-4 py-3 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-y transition-all focus:border-primary/50"
+                                />
+                            </div>
+                        </>
+                    ) : (
+                        <div className="space-y-2">
+                            <label htmlFor="message" className="ml-1 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                Your Message
+                            </label>
+                            <textarea
+                                required
+                                id="message"
+                                name="message"
+                                value={formData.message}
+                                onChange={handleChange}
+                                placeholder="How can we improve? What's on your mind?"
+                                className="flex min-h-[150px] w-full rounded-xl border border-input bg-background/50 px-4 py-3 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-y transition-all focus:border-primary/50"
+                            />
+                        </div>
+                    )}
 
                     <div className="pt-4">
                         <button
@@ -214,7 +276,7 @@ export function ContactForm({ embedded = false, serviceTitle }: ContactFormProps
                                 </>
                             ) : (
                                 <>
-                                    Send Message
+                                    {formMode === "project" ? "Send Project Request" : "Send Feedback"}
                                     <Send className="ml-2 h-4 w-4" />
                                 </>
                             )}
