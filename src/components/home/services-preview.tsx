@@ -67,6 +67,7 @@ const services = [
         description: "Automate repetitive tasks to save time and resources.",
         details: "Work smarter, not harder. We identify bottlenecks in your processes and implement intelligent automation solutions using scripts, bots, and AI to free up your team for high-value work."
     }
+
 ]
 
 export function ServicesPreview() {
