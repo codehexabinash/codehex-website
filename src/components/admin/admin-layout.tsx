@@ -70,7 +70,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                     key: 'project_availability',
                     value: { is_available: newValue },
                     updated_at: new Date().toISOString()
-                })
+                } as any)
 
             if (error) {
                 throw error
