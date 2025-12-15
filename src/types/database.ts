@@ -131,6 +131,55 @@ export interface Database {
                     created_at?: string
                 }
             }
+            services: {
+                Row: {
+                    id: string
+                    name: string
+                    created_at: string
+                }
+                Insert: {
+                    id?: string
+                    name: string
+                    created_at?: string
+                }
+                Update: {
+                    id?: string
+                    name?: string
+                    created_at?: string
+                }
+            }
+            featured_work: {
+                Row: {
+                    id: string
+                    title: string
+                    subject: string
+                    image_url: string
+                    blog_post_url: string | null
+                    category: string
+                    color: string | null
+                    created_at: string
+                }
+                Insert: {
+                    id?: string
+                    title: string
+                    subject: string
+                    image_url: string
+                    blog_post_url?: string | null
+                    category: string
+                    color?: string | null
+                    created_at?: string
+                }
+                Update: {
+                    id?: string
+                    title?: string
+                    subject?: string
+                    image_url?: string
+                    blog_post_url?: string | null
+                    category?: string
+                    color?: string | null
+                    created_at?: string
+                }
+            }
         }
     }
 }

@@ -48,9 +48,9 @@ export function TestimonialsSlider() {
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl"
+                    className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl text-black dark:text-white"
                 >
-                    Client Testimonials
+                    Client <span className="text-primary">Testimonials</span>
                 </motion.h2>
                 <motion.p
                     initial={{ opacity: 0, y: 20 }}

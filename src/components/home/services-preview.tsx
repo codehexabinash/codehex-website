@@ -101,9 +101,9 @@ export function ServicesPreview() {
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
-                            className="text-3xl font-bold tracking-tight sm:text-4xl"
+                            className="text-3xl font-bold tracking-tight sm:text-4xl text-black dark:text-white"
                         >
-                            Our Services
+                            Our <span className="text-primary">Services</span>
                         </motion.h2>
                         <motion.p
                             initial={{ opacity: 0, y: 20 }}

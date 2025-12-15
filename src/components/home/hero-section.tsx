@@ -1,4 +1,6 @@
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
+import { supabase } from "../../lib/supabase"
+import { cn } from "../../lib/utils"
 import { Link } from "react-router-dom"
 import { motion, useMotionValue } from "framer-motion"
 import { FloatingCard } from "../ui/floating-card"
@@ -9,7 +11,27 @@ export function HeroSection() {
     const mouseX = useMotionValue(0)
     const mouseY = useMotionValue(0)
 
-    // No scroll animations - keep it simple and smooth
+    // Project Availability State
+    const [isAvailable, setIsAvailable] = useState(true)
+
+    useEffect(() => {
+        async function fetchSettings() {
+            try {
+                const { data } = await supabase
+                    .from('site_settings')
+                    .select('value')
+                    .eq('key', 'project_availability')
+                    .single()
+
+                if (data && (data as any).value) {
+                    setIsAvailable((data as any).value.is_available)
+                }
+            } catch (err) {
+                console.error('Failed to fetch settings:', err)
+            }
+        }
+        fetchSettings()
+    }, [])
 
     const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
         const { clientX, clientY } = e
@@ -180,16 +202,32 @@ export function HeroSection() {
                     transition={{ duration: 0.8 }}
                     className="flex flex-col items-center"
                 >
-                    <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-sm font-medium backdrop-blur-md">
-                        <span className="relative flex h-2 w-2">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                        </span>
-                        Available for new projects
-                    </span>
+                    <div className="mb-4 flex justify-center">
+                        <div className={cn(
+                            "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-medium backdrop-blur-md transition-colors",
+                            isAvailable
+                                ? "border-green-500/20 bg-green-500/10 text-green-500"
+                                : "border-red-500/20 bg-red-500/10 text-red-500"
+                        )}>
+                            <span className={cn(
+                                "relative flex h-2 w-2",
+                                isAvailable ? "animate-pulse" : ""
+                            )}>
+                                <span className={cn(
+                                    "absolute inline-flex h-full w-full rounded-full opacity-75",
+                                    isAvailable ? "animate-ping bg-green-500" : "bg-red-500"
+                                )}></span>
+                                <span className={cn(
+                                    "relative inline-flex h-2 w-2 rounded-full",
+                                    isAvailable ? "bg-green-500" : "bg-red-500"
+                                )}></span>
+                            </span>
+                            {isAvailable ? "Available for new projects" : "Fully booked at the moment"}
+                        </div>
+                    </div>
 
-                    <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-[10rem] font-black tracking-tighter leading-[0.9]">
-                        CODE<span className="text-transparent bg-clip-text bg-gradient-to-b from-white to-white/40">HEX</span>
+                    <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-[10rem] font-black tracking-tighter leading-[0.9] text-black dark:text-white">
+                        CODE<span className="text-blue-600 dark:text-blue-500">HEX</span>
                     </h1>
 
                     <p className="mt-8 max-w-2xl text-lg text-muted-foreground sm:text-xl font-light">
@@ -199,8 +237,8 @@ export function HeroSection() {
 
                     <div className="mt-10 flex gap-4">
                         <Link to="/contact">
-                            <button className="group relative inline-flex h-12 items-center justify-center overflow-hidden rounded-full bg-primary px-8 font-medium text-primary-foreground transition-all hover:w-40 hover:bg-primary/90 min-w-[140px]">
-                                <span className="mr-2">Start Project</span>
+                            <button className="group relative inline-flex h-12 items-center justify-center overflow-hidden rounded-full bg-primary px-8 font-medium text-primary-foreground transition-all hover:bg-primary/90 min-w-[140px]">
+                                <span className="mr-2 whitespace-nowrap">Start Project</span>
                                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                             </button>
                         </Link>

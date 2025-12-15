@@ -14,6 +14,8 @@ import { FeedbackPage } from "./pages/admin/feedback";
 import { BlogListPage } from "./pages/admin/blog/index";
 import { BlogEditorPage } from "./pages/admin/blog/editor";
 import { BlogPost } from "./pages/blog-post";
+import { ServicesPage } from "./pages/admin/services";
+import { FeaturedWorkPage } from "./pages/admin/featured-work";
 
 function App() {
   return (
@@ -35,6 +37,8 @@ function App() {
           <Route path="/admin" element={<Navigate to="/admin/leads" replace />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin/leads" element={<LeadsPage />} />
+          <Route path="/admin/services" element={<ServicesPage />} />
+          <Route path="/admin/featured-work" element={<FeaturedWorkPage />} />
           <Route path="/admin/feedback" element={<FeedbackPage />} />
           <Route path="/admin/blog" element={<BlogListPage />} />
           <Route path="/admin/blog/new" element={<BlogEditorPage />} />

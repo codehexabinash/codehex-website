@@ -1,8 +1,7 @@
-import { useRef } from "react"
+import { useRef, useState, useEffect } from "react"
 import { motion, useScroll, useTransform, MotionValue } from "framer-motion"
 import { ArrowUpRight } from "lucide-react"
-
-import { caseStudies } from "../../data/case-studies"
+import { supabase } from "../../lib/supabase"
 
 interface CardProps {
     title: string
@@ -14,9 +13,10 @@ interface CardProps {
     range: number[]
     targetScale: number
     isLast: boolean
+    link?: string
 }
 
-const Card = ({ title, description, image, category, color, progress, range, targetScale, isLast }: CardProps) => {
+const Card = ({ title, description, image, category, color, progress, range, targetScale, isLast, link }: CardProps) => {
     const container = useRef(null)
     const { scrollYProgress } = useScroll({
         target: container,
@@ -41,6 +41,12 @@ const Card = ({ title, description, image, category, color, progress, range, tar
     const lastCardY = useTransform(progress, [0.90, 1], [0, -172]) // Starts slightly overlapping with title end
     const y = isLast ? lastCardY : yTransform
 
+    const handleRedirect = () => {
+        if (link) {
+            window.open(link, '_blank')
+        }
+    }
+
     return (
         <div ref={container} className="flex h-[80vh] items-center justify-center sticky top-20 sm:top-24 sm:h-screen">
             <motion.div
@@ -63,7 +69,7 @@ const Card = ({ title, description, image, category, color, progress, range, tar
                         <p className="text-sm text-white/70 leading-relaxed sm:text-base md:text-lg">{description}</p>
                     </div>
 
-                    <div className="mt-8 flex items-center gap-2 group cursor-pointer">
+                    <div className="mt-8 flex items-center gap-2 group cursor-pointer" onClick={handleRedirect}>
                         <span className="text-sm font-medium text-white transition-colors group-hover:text-primary-foreground sm:text-base">Read Case Study</span>
                         <div className="flex h-8 w-8 items-center justify-center rounded-full border border-white/20 transition-all group-hover:bg-white group-hover:text-black">
                             <ArrowUpRight className="h-4 w-4" />
@@ -94,34 +100,75 @@ export function CaseStudyCarousel() {
 
     const titleY = useTransform(scrollYProgress, [0.80, 0.90], [0, -200])
 
+    const [projects, setProjects] = useState<any[]>([])
+    const [isLoading, setIsLoading] = useState(true)
+
+    useEffect(() => {
+        const fetchProjects = async () => {
+            try {
+                const { data, error } = await supabase
+                    .from('featured_work')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+
+                if (error) throw error
+
+                // Transform data if needed, or map directly if field names match
+                // We need to map db 'image_url' to 'image' and 'blog_post_url' to 'link' if we want to match CardProps exactly,
+                // OR update Card to accept the new prop names.
+                // Let's map it here to match existing Card component props for simplicity
+                const mappedProjects = ((data as any[]) || []).map(p => ({
+                    id: p.id,
+                    title: p.title,
+                    description: p.subject, // Mapping subject to description as requested
+                    image: p.image_url,
+                    category: p.category,
+                    color: p.color || '#000000',
+                    link: p.blog_post_url // Added to pass to card if we update card to use it
+                }))
+
+                setProjects(mappedProjects)
+            } catch (err) {
+                console.error("Failed to fetch projects:", err)
+            } finally {
+                setIsLoading(false)
+            }
+        }
+
+        fetchProjects()
+    }, [])
+
     return (
         <section className="bg-background pt-0 pb-0 -mb-40">
             <motion.div style={{ y: titleY }} className="sticky top-5 z-20 bg-background/40 backdrop-blur-xl pt-10 pb-10 mb-6">
                 <div className="container px-4 text-center">
-                    <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Featured Work</h2>
+                    <h2 className="text-3xl font-bold tracking-tight sm:text-4xl text-black dark:text-white">Featured <span className="text-primary">Work</span></h2>
                     <p className="mt-2 text-muted-foreground">See how we transform ideas into reality. Scroll to explore.</p>
                 </div>
             </motion.div>
 
             <div ref={container} className="px-4 w-full">
-                {caseStudies.map((project, i) => {
-                    // Standardize target scale - all cards scale down to same size when leaving
-                    const targetScale = 0.9
-                    return (
-                        <Card
-                            key={project.id}
-                            // i passed only for key in map, not prop
-                            {...project}
-                            progress={scrollYProgress}
-                            range={[i * 0.25, 1]}
-                            targetScale={targetScale}
-                            isLast={i === caseStudies.length - 1}
-                        />
-                    )
-                })}
+                {isLoading ? (
+                    <div className="py-20 text-center">Loading Featured Work...</div>
+                ) : projects.length === 0 ? (
+                    <div className="py-20 text-center">No featured work found.</div>
+                ) : (
+                    projects.map((project, i) => {
+                        // Standardize target scale - all cards scale down to same size when leaving
+                        const targetScale = 0.9
+                        return (
+                            <Card
+                                key={project.id}
+                                {...project}
+                                progress={scrollYProgress}
+                                range={[i * 0.25, 1]}
+                                targetScale={targetScale}
+                                isLast={i === projects.length - 1}
+                            />
+                        )
+                    })
+                )}
             </div>
-
-
         </section>
     )
 }

@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom"
-import { LayoutDashboard, MessageSquare, FileText, LogOut, Users, Sun, Moon, Menu, X } from "lucide-react"
-import { useState } from "react"
+import { LayoutDashboard, MessageSquare, FileText, LogOut, Users, Sun, Moon, Menu, X, Layers, Briefcase } from "lucide-react"
+import { useState, useEffect } from "react"
 import { supabase } from "../../lib/supabase"
 import { cn } from "../../lib/utils"
 import { useTheme } from "../../context/theme-provider"
@@ -17,12 +17,69 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
 
     const navItems = [
         { name: "Leads", href: "/admin/leads", icon: Users },
+        { name: "Services", href: "/admin/services", icon: Layers },
+        { name: "Featured Work", href: "/admin/featured-work", icon: Briefcase },
         { name: "Feedback", href: "/admin/feedback", icon: MessageSquare },
         { name: "Blog Posts", href: "/admin/blog", icon: FileText },
     ]
 
 
     const [sidebarOpen, setSidebarOpen] = useState(false)
+    const [isAvailable, setIsAvailable] = useState(false)
+    const [isLoadingSettings, setIsLoadingSettings] = useState(true)
+
+    useEffect(() => {
+        fetchSettings()
+    }, [])
+
+    async function fetchSettings() {
+        try {
+            const { data, error } = await supabase
+                .from('site_settings')
+                .select('value')
+                .eq('key', 'project_availability')
+                .single()
+
+            if (error) {
+                if (error.code !== 'PGRST116') {
+                    console.error('Error fetching settings:', error)
+                }
+                return
+            }
+
+            if (data && (data as any).value) {
+                setIsAvailable((data as any).value.is_available)
+            }
+        } catch (err) {
+            console.error('Failed to fetch settings:', err)
+        } finally {
+            setIsLoadingSettings(false)
+        }
+    }
+
+    async function toggleAvailability() {
+        if (isLoadingSettings) return
+
+        const newValue = !isAvailable
+        setIsAvailable(newValue) // Optimistic update
+
+        try {
+            const { error } = await supabase
+                .from('site_settings')
+                .upsert({
+                    key: 'project_availability',
+                    value: { is_available: newValue },
+                    updated_at: new Date().toISOString()
+                })
+
+            if (error) {
+                throw error
+            }
+        } catch (err) {
+            console.error('Error updating availability:', err)
+            setIsAvailable(!newValue) // Revert on error
+        }
+    }
 
     return (
         <div className="flex min-h-screen bg-muted/40 font-sans">
@@ -98,14 +155,36 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                         </Link>
                     ))}
                 </nav>
-                <div className="p-4 border-t">
-                    <button
-                        onClick={handleLogout}
-                        className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-red-500 transition-colors hover:bg-red-500/10"
-                    >
-                        <LogOut className="h-4 w-4" />
-                        Sign Out
-                    </button>
+                <div className="p-4 border-t mt-auto">
+                    <div className="flex flex-col gap-4">
+                        {/* Project Availability Toggle */}
+                        <div className="flex items-center justify-between px-2">
+                            <span className="text-sm font-medium">Available for work</span>
+                            <button
+                                onClick={toggleAvailability}
+                                disabled={isLoadingSettings}
+                                className={cn(
+                                    "relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+                                    isAvailable ? "bg-primary" : "bg-input"
+                                )}
+                            >
+                                <span
+                                    className={cn(
+                                        "inline-block h-4 w-4 transform rounded-full bg-background transition-transform",
+                                        isAvailable ? "translate-x-6" : "translate-x-1"
+                                    )}
+                                />
+                            </button>
+                        </div>
+
+                        <button
+                            onClick={handleLogout}
+                            className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-red-500 transition-colors hover:bg-red-500/10"
+                        >
+                            <LogOut className="h-4 w-4" />
+                            Sign Out
+                        </button>
+                    </div>
                 </div>
             </aside>
 

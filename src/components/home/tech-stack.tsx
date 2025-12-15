@@ -42,7 +42,7 @@ export function TechStack() {
         <section className="pt-0 pb-12">
             <div className="container px-4 text-center">
                 <h2 className="mb-12 text-3xl font-bold tracking-tight sm:text-4xl text-black dark:text-white">
-                    Our Tech Stack
+                    Our <span className="text-primary">Tech Stack</span>
                 </h2>
 
                 <motion.div
