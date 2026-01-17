@@ -19,6 +19,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
         { name: "Leads", href: "/admin/leads", icon: Users },
         { name: "Services", href: "/admin/services", icon: Layers },
         { name: "Featured Work", href: "/admin/featured-work", icon: Briefcase },
+        { name: "Team Members", href: "/admin/team", icon: Users },
         { name: "Feedback", href: "/admin/feedback", icon: MessageSquare },
         { name: "Blog Posts", href: "/admin/blog", icon: FileText },
     ]

@@ -227,7 +227,7 @@ export function HeroSection() {
                     </div>
 
                     <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-[10rem] font-black tracking-tighter leading-[0.9] text-black dark:text-white">
-                        CODE<span className="text-blue-600 dark:text-blue-500">HEX</span>
+                        CODE<span className="text-blue-600 dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-b dark:from-white dark:to-white/40">HEX</span>
                     </h1>
 
                     <p className="mt-8 max-w-2xl text-lg text-muted-foreground sm:text-xl font-light">

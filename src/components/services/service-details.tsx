@@ -1,10 +1,13 @@
+
 import { motion } from "framer-motion";
-import { type ServiceDetail } from "../../data/services";
 import { fadeInUp, staggerContainer } from "../../utils/animations";
 import { RelatedCaseStudies } from "./related-case-studies";
 import { ContactForm } from "../home/contact-form";
 import { useState } from "react";
 import React from "react";
+import type { Database } from "../../types/database";
+
+type ServiceDetailRow = Database['public']['Tables']['service_details']['Row'];
 
 function TechBadge({ item }: { item: { name: string; icon: string; description: string } }) {
     const [isHovered, setIsHovered] = useState(false);
@@ -41,11 +44,16 @@ function TechBadge({ item }: { item: { name: string; icon: string; description: 
 }
 
 interface ServiceDetailsProps {
-    service: ServiceDetail;
+    service: ServiceDetailRow;
     icon?: React.ElementType;
 }
 
 export function ServiceDetails({ service, icon: Icon }: ServiceDetailsProps) {
+    // Cast JSON fields to expected types
+    const techStack = (service.tech_stack as any[]) || [];
+    const successStories = (service.success_stories as any[]) || [];
+    const benefits = service.benefits || [];
+
     return (
         <motion.div
             variants={staggerContainer}
@@ -66,15 +74,15 @@ export function ServiceDetails({ service, icon: Icon }: ServiceDetailsProps) {
                     </motion.div>
                 )}
                 <motion.h2 variants={fadeInUp} className="text-4xl font-bold tracking-tight">
-                    {service.title}
+                    {service.header_title}
                 </motion.h2>
                 <motion.p variants={fadeInUp} className="text-xl text-muted-foreground leading-relaxed">
-                    {service.fullDescription}
+                    {service.header_description}
                 </motion.p>
             </div>
 
             <motion.div variants={fadeInUp} className="grid sm:grid-cols-2 gap-4">
-                {service.benefits.map((benefit, index) => (
+                {benefits.map((benefit, index) => (
                     <div key={index} className="flex items-start gap-3 p-4 rounded-xl bg-accent/20 border border-accent/20">
                         <div className="h-2 w-2 mt-2 rounded-full bg-primary shrink-0" />
                         <span className="font-medium">{benefit}</span>
@@ -85,18 +93,25 @@ export function ServiceDetails({ service, icon: Icon }: ServiceDetailsProps) {
             <motion.div variants={fadeInUp} className="space-y-4">
                 <h3 className="text-xl font-semibold">Technologies We Use</h3>
                 <div className="flex flex-wrap gap-3">
-                    {service.techStack.map((tech) => (
+                    {techStack.map((tech) => (
                         <TechBadge key={tech.name} item={tech} />
                     ))}
                 </div>
             </motion.div>
 
             <motion.div variants={fadeInUp}>
-                <RelatedCaseStudies studies={service.relatedCaseStudies} />
+                {/* Need to ensure RelatedCaseStudies accepts the new format or map it */}
+                <RelatedCaseStudies studies={successStories.map((s: any) => ({
+                    id: s.link || s.title, // Use link or title as ID if not present
+                    title: s.title,
+                    client: s.client,
+                    image: s.image_url,
+                    link: s.link
+                }))} />
             </motion.div>
 
             <motion.div variants={fadeInUp}>
-                <ContactForm embedded serviceTitle={service.title} />
+                <ContactForm embedded serviceTitle={service.header_title} />
             </motion.div>
         </motion.div>
     );

@@ -1,21 +1,27 @@
+
 import { useEffect, useState } from "react"
 import { supabase } from "../../lib/supabase"
-import { Plus, Trash2, Loader2, AlertCircle } from "lucide-react"
+import { Plus, Trash2, Loader2, AlertCircle, Edit, ArrowLeft, CheckCircle } from "lucide-react"
 import { AdminLayout } from "../../components/admin/admin-layout"
 import { AuthGuard } from "../../components/admin/auth-guard"
+import { ServiceForm } from "../../components/admin/service-form"
+import type { Database } from "../../types/database"
 
-interface Service {
-    id: string
-    name: string
-    created_at: string
-}
+type Service = Database['public']['Tables']['services']['Row']
+type ServiceDetail = Database['public']['Tables']['service_details']['Row']
 
 export function ServicesPage() {
     const [services, setServices] = useState<Service[]>([])
+    const [serviceDetails, setServiceDetails] = useState<ServiceDetail[]>([])
     const [isLoading, setIsLoading] = useState(true)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [newName, setNewName] = useState("")
     const [error, setError] = useState("")
+
+    // Editor View State
+    const [isEditing, setIsEditing] = useState(false)
+    const [editingServiceId, setEditingServiceId] = useState<string | null>(null)
+    const [editingDetail, setEditingDetail] = useState<ServiceDetail | undefined>(undefined)
 
     useEffect(() => {
         fetchServices()
@@ -23,13 +29,21 @@ export function ServicesPage() {
 
     async function fetchServices() {
         try {
-            const { data, error } = await supabase
+            const { data: servicesData, error: servicesError } = await supabase
                 .from("services")
                 .select("*")
                 .order("created_at", { ascending: false })
 
-            if (error) throw error
-            setServices(data || [])
+            if (servicesError) throw servicesError
+
+            const { data: detailsData, error: detailsError } = await supabase
+                .from("service_details")
+                .select("*")
+
+            if (detailsError) throw detailsError
+
+            setServices(servicesData || [])
+            setServiceDetails(detailsData || [])
         } catch (err: any) {
             console.error("Error fetching services:", err)
             setError("Failed to load services")
@@ -63,7 +77,7 @@ export function ServicesPage() {
     }
 
     async function handleDeleteService(id: string) {
-        if (!window.confirm("Are you sure you want to delete this service?")) return
+        if (!window.confirm("Are you sure you want to delete this service? This will also delete all associated details.")) return
 
         try {
             const { error } = await supabase
@@ -79,13 +93,57 @@ export function ServicesPage() {
         }
     }
 
+    const handleEditDetails = (service: Service) => {
+        const detail = serviceDetails.find(d => d.service_id === service.id)
+        setEditingServiceId(service.id)
+        setEditingDetail(detail)
+        setIsEditing(true)
+    }
+
+    const handleSuccess = () => {
+        setIsEditing(false)
+        setEditingServiceId(null)
+        setEditingDetail(undefined)
+        fetchServices()
+    }
+
+    if (isEditing) {
+        return (
+            <AuthGuard>
+                <AdminLayout>
+                    <div className="mb-6">
+                        <button
+                            onClick={() => setIsEditing(false)}
+                            className="flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                            <ArrowLeft className="h-4 w-4 mr-1" /> Back to Services
+                        </button>
+                    </div>
+                    <div className="mb-8">
+                        <h1 className="text-3xl font-bold tracking-tight">
+                            {editingDetail ? 'Edit Service Details' : 'Add Service Details'}
+                        </h1>
+                        <p className="text-muted-foreground">
+                            Editing details for service ID: {editingServiceId}
+                        </p>
+                    </div>
+                    <ServiceForm
+                        initialData={editingDetail}
+                        serviceId={editingServiceId || undefined}
+                        onSuccess={handleSuccess}
+                    />
+                </AdminLayout>
+            </AuthGuard>
+        )
+    }
+
     return (
         <AuthGuard>
             <AdminLayout>
                 <div className="space-y-8">
                     <div>
                         <h1 className="text-3xl font-bold tracking-tight">Services</h1>
-                        <p className="text-muted-foreground">Manage the service categories available for featured work.</p>
+                        <p className="text-muted-foreground">Manage service categories and their detailed content.</p>
                     </div>
 
                     {/* Add Service Form */}
@@ -93,7 +151,7 @@ export function ServicesPage() {
                         <form onSubmit={handleAddService} className="flex gap-4 items-end">
                             <div className="grid w-full max-w-sm items-center gap-1.5">
                                 <label htmlFor="service-name" className="text-sm font-medium">
-                                    New Service Name
+                                    New Service Category
                                 </label>
                                 <input
                                     id="service-name"
@@ -110,7 +168,7 @@ export function ServicesPage() {
                                 className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 h-10"
                             >
                                 {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4 mr-2" />}
-                                Add Service
+                                Add Category
                             </button>
                         </form>
                         {error && (
@@ -136,18 +194,38 @@ export function ServicesPage() {
                             </div>
                         ) : (
                             <div className="divide-y">
-                                {services.map((service) => (
-                                    <div key={service.id} className="p-4 flex items-center justify-between hover:bg-muted/50 transition-colors">
-                                        <span className="font-medium">{service.name}</span>
-                                        <button
-                                            onClick={() => handleDeleteService(service.id)}
-                                            className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md transition-colors"
-                                            title="Delete Service"
-                                        >
-                                            <Trash2 className="h-4 w-4" />
-                                        </button>
-                                    </div>
-                                ))}
+                                {services.map((service) => {
+                                    const hasDetails = serviceDetails.some(d => d.service_id === service.id);
+                                    return (
+                                        <div key={service.id} className="p-4 flex items-center justify-between hover:bg-muted/50 transition-colors">
+                                            <div className="flex items-center gap-4">
+                                                <span className="font-medium text-lg">{service.name}</span>
+                                                {hasDetails && (
+                                                    <span className="flex items-center text-xs text-green-600 bg-green-100 dark:bg-green-900/30 dark:text-green-400 px-2 py-1 rounded-full">
+                                                        <CheckCircle className="w-3 h-3 mr-1" />
+                                                        Configured
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <button
+                                                    onClick={() => handleEditDetails(service)}
+                                                    className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3"
+                                                >
+                                                    <Edit className="h-4 w-4 mr-2" />
+                                                    {hasDetails ? 'Edit Details' : 'Add Details'}
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDeleteService(service.id)}
+                                                    className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-9 px-3"
+                                                    title="Delete Service"
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )
+                                })}
                             </div>
                         )}
                     </div>

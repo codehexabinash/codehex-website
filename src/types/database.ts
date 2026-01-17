@@ -147,6 +147,50 @@ export interface Database {
                     name?: string
                     created_at?: string
                 }
+            },
+            service_details: {
+                Row: {
+                    id: string
+                    service_id: string
+                    slug: string
+                    icon_name: string
+                    card_title: string
+                    card_description: string
+                    header_title: string
+                    header_description: string
+                    benefits: string[] | null
+                    tech_stack: Json | null
+                    success_stories: Json | null
+                    created_at: string
+                }
+                Insert: {
+                    id?: string
+                    service_id: string
+                    slug: string
+                    icon_name: string
+                    card_title: string
+                    card_description: string
+                    header_title: string
+                    header_description: string
+                    benefits?: string[] | null
+                    tech_stack?: Json | null
+                    success_stories?: Json | null
+                    created_at?: string
+                }
+                Update: {
+                    id?: string
+                    service_id?: string
+                    slug?: string
+                    icon_name?: string
+                    card_title?: string
+                    card_description?: string
+                    header_title?: string
+                    header_description?: string
+                    benefits?: string[] | null
+                    tech_stack?: Json | null
+                    success_stories?: Json | null
+                    created_at?: string
+                }
             }
             featured_work: {
                 Row: {
@@ -177,6 +221,44 @@ export interface Database {
                     blog_post_url?: string | null
                     category?: string
                     color?: string | null
+                    created_at?: string
+                }
+            }
+            team_members: {
+                Row: {
+                    id: string
+                    name: string
+                    role: string
+                    bio: string
+                    image_url: string
+                    linkedin_url: string | null
+                    twitter_url: string | null
+                    github_url: string | null
+                    display_order: number | null
+                    created_at: string
+                }
+                Insert: {
+                    id?: string
+                    name: string
+                    role: string
+                    bio: string
+                    image_url: string
+                    linkedin_url?: string | null
+                    twitter_url?: string | null
+                    github_url?: string | null
+                    display_order?: number | null
+                    created_at?: string
+                }
+                Update: {
+                    id?: string
+                    name?: string
+                    role?: string
+                    bio?: string
+                    image_url?: string
+                    linkedin_url?: string | null
+                    twitter_url?: string | null
+                    github_url?: string | null
+                    display_order?: number | null
                     created_at?: string
                 }
             }

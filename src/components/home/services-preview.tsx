@@ -1,81 +1,44 @@
-import { useState, useRef } from "react"
+
+import { useState, useRef, useEffect } from "react"
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion"
 import { useOutsideClick } from "../../hooks/use-outside-click"
-import { Code, Smartphone, Globe, Cloud, Database, BarChart, PenTool, Shield, Zap, X, ChevronRight } from "lucide-react"
+import {
+    Code, Smartphone, Globe, Cloud, Database, BarChart, PenTool, Shield, Zap,
+    Layers, Cpu, Server, Lock, Search, Terminal, Layout, Monitor, Wifi,
+    MessageSquare, Settings, Hash, Box, Activity
+} from "lucide-react"
+import { supabase } from "../../lib/supabase"
+import { X, ChevronRight } from "lucide-react"
+import type { Database as DBTypes } from "../../types/database"
 
-const services = [
-    {
-        id: "web-dev",
-        icon: Globe,
-        title: "Web Development",
-        description: "Responsive, high-performance websites built with modern technologies.",
-        details: "We build pixel-perfect, performant websites using the latest frameworks like React, Next.js, and Tailwind CSS. From landing pages to complex web applications, we ensure your digital presence is robust, SEO-friendly, and scalable."
-    },
-    {
-        id: "mobile-apps",
-        icon: Smartphone,
-        title: "Mobile Apps",
-        description: "Native and cross-platform mobile applications for iOS and Android.",
-        details: "Reach your customers on the go with our custom mobile app development services. We prefer React Native and Flutter to deliver smooth, native-like experiences across all devices without compromising on performance."
-    },
-    {
-        id: "custom-soft",
-        icon: Code,
-        title: "Custom Software",
-        description: "Tailored software solutions to streamline your business operations.",
-        details: "Off-the-shelf software often falls short. We engineer bespoke software solutions designed specifically for your workflows, helping you automate processes, integrate systems, and boost operational efficiency."
-    },
-    {
-        id: "ui-ux",
-        icon: PenTool,
-        title: "UI/UX Design",
-        description: "User-centric design that drives engagement and satisfaction.",
-        details: "Great software starts with great design. Our design team focuses on intuitive user journeys, accessibility, and stunning visuals to create interfaces that users love to interact with."
-    },
-    {
-        id: "cloud-serv",
-        icon: Cloud,
-        title: "Cloud Services",
-        description: "Scalable cloud infrastructure and migration services.",
-        details: "Leverage the power of the cloud. We assist with cloud migration, architecture design, and serverless implementation on AWS, Azure, or Google Cloud to ensure your infrastructure is secure and scalable."
-    },
-    {
-        id: "data-analytics",
-        icon: Database,
-        title: "Data Analytics",
-        description: "Turn data into actionable insights with advanced analytics.",
-        details: "Unlock the value of your data. We build data pipelines, dashboards, and reporting tools that give you real-time visibility into your key performance indicators and business metrics."
-    },
-    {
-        id: "cybersecurity",
-        icon: Shield,
-        title: "Cybersecurity",
-        description: "Protect your digital assets with robust security measures.",
-        details: "Security is non-negotiable. We conduct vulnerability assessments, implement encryption, and ensure compliance with industry standards to safeguard your critical business data."
-    },
-    {
-        id: "digital-marketing",
-        icon: BarChart,
-        title: "Digital Marketing",
-        description: "Grow your reach with targeted digital marketing strategies.",
-        details: "Drive traffic and convert leads. Our data-driven marketing strategies include SEO, content marketing, and PPC campaigns designed to maximize your ROI and brand visibility."
-    },
-    {
-        id: "automation",
-        icon: Zap,
-        title: "Automation",
-        description: "Automate repetitive tasks to save time and resources.",
-        details: "Work smarter, not harder. We identify bottlenecks in your processes and implement intelligent automation solutions using scripts, bots, and AI to free up your team for high-value work."
-    }
+// Icon mapping
+const iconMap: Record<string, any> = {
+    Globe, Smartphone, Code, PenTool, Cloud, Database, BarChart, Shield, Zap,
+    Layers, Cpu, Server, Lock, Search, Terminal, Layout, Monitor, Wifi,
+    MessageSquare, Settings, Hash, Box, Activity
+};
 
-]
+type ServiceDetail = DBTypes['public']['Tables']['service_details']['Row'];
 
 export function ServicesPreview() {
+    const [services, setServices] = useState<ServiceDetail[]>([])
     const [selectedId, setSelectedId] = useState<string | null>(null)
     const ref = useRef<HTMLDivElement>(null)
     const sectionRef = useRef<HTMLElement>(null)
 
     useOutsideClick(ref, () => setSelectedId(null))
+
+    useEffect(() => {
+        async function fetchServices() {
+            const { data } = await supabase
+                .from('service_details')
+                .select('*')
+                .order('created_at', { ascending: true });
+
+            if (data) setServices(data);
+        }
+        fetchServices();
+    }, []);
 
     const selectedService = services.find(s => s.id === selectedId)
 
@@ -87,6 +50,11 @@ export function ServicesPreview() {
 
     // Transform scroll progress to width percentage (80% to 100%)
     const width = useTransform(scrollYProgress, [0, 1], ["80%", "100%"])
+
+    const getIcon = (name: string) => {
+        const IconComponent = iconMap[name] || Globe;
+        return IconComponent;
+    };
 
     return (
         <section ref={sectionRef} className="relative overflow-hidden pt-0 pb-10 bg-background">
@@ -118,28 +86,31 @@ export function ServicesPreview() {
 
                     <div className="container mx-auto">
                         <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-                            {services.map((service) => (
-                                <motion.div
-                                    layoutId={`card-${service.id}`}
-                                    key={service.id}
-                                    onClick={() => setSelectedId(service.id)}
-                                    whileHover={{ scale: 1.02 }}
-                                    className="group relative cursor-pointer overflow-hidden rounded-xl bg-card p-4 shadow-sm border transition-colors hover:border-primary/50 dark:hover:border-primary/50"
-                                >
+                            {services.map((service) => {
+                                const Icon = getIcon(service.icon_name);
+                                return (
                                     <motion.div
-                                        layoutId={`icon-container-${service.id}`}
-                                        className="mb-2 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground"
+                                        layoutId={`card-${service.id}`}
+                                        key={service.id}
+                                        onClick={() => setSelectedId(service.id)}
+                                        whileHover={{ scale: 1.02 }}
+                                        className="group relative cursor-pointer overflow-hidden rounded-xl bg-card p-4 shadow-sm border transition-colors hover:border-primary/50 dark:hover:border-primary/50"
                                     >
-                                        <service.icon className="h-6 w-6" />
-                                    </motion.div>
-                                    <motion.h3 layoutId={`title-${service.id}`} className="mb-1 text-lg font-bold leading-tight">{service.title}</motion.h3>
-                                    <motion.p layoutId={`desc-${service.id}`} className="text-sm text-muted-foreground line-clamp-2">{service.description}</motion.p>
+                                        <motion.div
+                                            layoutId={`icon-container-${service.id}`}
+                                            className="mb-2 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground"
+                                        >
+                                            <Icon className="h-6 w-6" />
+                                        </motion.div>
+                                        <motion.h3 layoutId={`title-${service.id}`} className="mb-1 text-lg font-bold leading-tight">{service.card_title}</motion.h3>
+                                        <motion.p layoutId={`desc-${service.id}`} className="text-sm text-muted-foreground line-clamp-2">{service.card_description}</motion.p>
 
-                                    <div className="mt-2 flex items-center text-xs font-medium text-primary opacity-0 transition-opacity group-hover:opacity-100">
-                                        Learn more <ChevronRight className="ml-1 h-3 w-3" />
-                                    </div>
-                                </motion.div>
-                            ))}
+                                        <div className="mt-2 flex items-center text-xs font-medium text-primary opacity-0 transition-opacity group-hover:opacity-100">
+                                            Learn more <ChevronRight className="ml-1 h-3 w-3" />
+                                        </div>
+                                    </motion.div>
+                                );
+                            })}
                         </div>
                     </div>
                 </div>
@@ -174,15 +145,18 @@ export function ServicesPreview() {
                                 layoutId={`icon-container-${selectedId}`}
                                 className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-xl bg-primary/10 text-primary"
                             >
-                                <selectedService.icon className="h-8 w-8" />
+                                {(() => {
+                                    const Icon = getIcon(selectedService.icon_name);
+                                    return <Icon className="h-8 w-8" />;
+                                })()}
                             </motion.div>
 
                             <motion.h3 layoutId={`title-${selectedId}`} className="mb-2 text-2xl font-bold">
-                                {selectedService.title}
+                                {selectedService.card_title}
                             </motion.h3>
 
                             <motion.p layoutId={`desc-${selectedId}`} className="mb-6 text-lg text-muted-foreground">
-                                {selectedService.description}
+                                {selectedService.card_description}
                             </motion.p>
 
                             <motion.div
@@ -193,9 +167,9 @@ export function ServicesPreview() {
                                 className="space-y-4"
                             >
                                 <div className="rounded-lg bg-muted p-4">
-                                    <h4 className="mb-2 font-semibold text-foreground">Why choose this service?</h4>
+                                    <h4 className="mb-2 font-semibold text-foreground">Overview</h4>
                                     <p className="text-sm text-muted-foreground leading-relaxed">
-                                        {selectedService.details}
+                                        {selectedService.header_description} {/* Fallback to header description or create a new field if needed, but header_description works for detailed view */}
                                     </p>
                                 </div>
 

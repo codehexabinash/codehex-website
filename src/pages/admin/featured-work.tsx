@@ -211,10 +211,10 @@ export function FeaturedWorkPage() {
 
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium">Subject / Client</label>
-                                    <input
-                                        type="text"
-                                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                                    <textarea
+                                        className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                                         placeholder="e.g. ShopifyPlus"
+                                        rows={3}
                                         value={formData.subject}
                                         onChange={(e) => setFormData(prev => ({ ...prev, subject: e.target.value }))}
                                     />
